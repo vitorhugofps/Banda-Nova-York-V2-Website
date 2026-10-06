@@ -1,5 +1,6 @@
 /* MEDIA KIT · banco de imagens
-   - Telão de LED curvo em 3D (CSS): câmera no centro de um anel de fotos; gira com a rolagem e com o arraste.
+   - Telão de LED curvo em 3D (CSS): câmera no centro de um anel de fotos. Fica preso na tela por um bom trecho da rolagem
+     e gira com ela (e com o arraste); a legenda acompanha a foto que está de frente.
    - Grade com recortes por ponto focal, filtros (GSAP Flip) e lightbox acessível. O site não oferece download das fotos. */
 import { $, $$, clamp, reduce, mq, once, RUN, testMode } from '../core/env.js';
 import { stopScroll, startScroll } from '../core/scroll.js';
@@ -109,13 +110,22 @@ export async function initMediaKit() {
 function initWall(sec, onOpen) {
   const wall = $('.wall', sec); if (!wall || reduce) return;
   const cam = $('.wall__cam', wall), ring = $('.wall__ring', wall), panels = $$('.wall__p', wall);
+  const capEl = $('[data-wall-cap]', wall), iEl = $('[data-wall-i]', wall), nEl = $('[data-wall-n]', wall), progEl = $('[data-wall-prog]', wall);
+  const pin = wall.closest('.wall-pin') || wall;
+  if (nEl) nEl.textContent = String(panels.length).padStart(2, '0');
+  let front = -1;
   const N = panels.length, TH = 360 / N;
   const { gsap, ScrollTrigger } = window;
   let W, H, R, P, scrollRy = 0, dragRy = 0, vel = 0, active = false, dragging = false, moved = 0;
   function measure() {
-    const vw = window.innerWidth;
-    W = clamp(vw * (vw < 600 ? 0.62 : 0.34), 220, 500);
-    H = W * 0.7;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    // telão grande: as fotos ocupam boa parte da tela
+    // (o painel da frente aparece a 80% do tamanho por causa da perspectiva)
+    const portrait = vw < 600 || vh > vw * 1.2;
+    const ar = portrait ? 1.05 : 0.66;
+    W = clamp(vw * (portrait ? 1.04 : 0.56), 280, 980);
+    H = Math.min(W * ar, vh * (portrait ? 0.62 : 0.66));
+    W = H / ar;
     R = (W + 10) / (2 * Math.sin((TH / 2) * Math.PI / 180));
     P = R * 0.8;
     cam.style.setProperty('--p', `${P}px`);
@@ -124,12 +134,19 @@ function initWall(sec, onOpen) {
   function render() {
     const ry = scrollRy + dragRy;
     ring.style.transform = `translateZ(${P}px) rotateY(${ry}deg)`;
+    let best = 0, bestA = 999;
     panels.forEach((p, i) => {
       let a = ((i * TH + ry) % 360 + 540) % 360 - 180;
       const vis = Math.abs(a) < 82;
       p.style.visibility = vis ? 'visible' : 'hidden';
-      if (vis) p.style.setProperty('--dim', (clamp((Math.abs(a) - 14) / 60) * 0.55).toFixed(3));
+      if (vis) p.style.setProperty('--dim', (clamp((Math.abs(a) - 10) / 55) * 0.6).toFixed(3));
+      if (Math.abs(a) < bestA) { bestA = Math.abs(a); best = i; }
     });
+    if (best !== front) {
+      front = best;
+      if (iEl) iEl.textContent = String(best + 1).padStart(2, '0');
+      if (capEl) { capEl.textContent = panels[best].dataset.cap || ''; gsap.fromTo(capEl, { clipPath: 'polygon(0 0, 0 0, -40% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 140% 0, 100% 100%, 0 100%)', duration: 0.45, ease: 'power3.out', overwrite: true }); }
+    }
   }
   // acerto do clique em 3D: o painel visível mais frontal cujo retângulo contém o ponto
   function hit(x, y) {
@@ -145,7 +162,8 @@ function initWall(sec, onOpen) {
   }
   measure(); render();
   window.addEventListener('resize', () => { measure(); render(); });
-  ScrollTrigger.create({ trigger: wall, start: 'top bottom', end: 'bottom top', onUpdate: (s) => { scrollRy = 40 - s.progress * 130; render(); } });
+  // preso na tela: a rolagem gira o anel quase uma volta inteira
+  ScrollTrigger.create({ trigger: pin, start: 'top bottom', end: 'bottom top', onUpdate: (s) => { scrollRy = 60 - s.progress * 400; if (progEl) progEl.style.transform = `scaleX(${s.progress.toFixed(3)})`; render(); } });
   if ('IntersectionObserver' in window) new IntersectionObserver((es) => { active = es[0].isIntersecting; }, { threshold: 0 }).observe(wall);
   gsap.ticker.add(() => {
     if (!active || dragging || Math.abs(vel) < 0.01) return;

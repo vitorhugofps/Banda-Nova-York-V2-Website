@@ -1,8 +1,9 @@
-/* Cabeçalho: entra animado depois da montagem do logo, fica sobre a abertura e some com blur preto depois do 2º slide.
-   Volta quando o mouse vai até o topo da tela (no toque, quando a pessoa rola para cima) e quando recebe foco pelo teclado.
-   Também cuida do link ativo, do menu do celular e da barra fixa "Quero a Nova York". */
-import { $, $$, reduce, fine } from '../core/env.js';
-import { stopScroll, startScroll } from '../core/scroll.js';
+/* Cabeçalho: escondido no slide do logo; aparece quando a animação do logo termina (a câmera atravessou o O);
+   some quando a pessoa passa o slide de vídeo da abertura e, daí em diante, volta sempre que ela rola para cima
+   (e some de novo ao rolar para baixo). Também aparece quando recebe foco pelo teclado.
+   Cuida ainda do link ativo, do menu do celular e da barra fixa "Quero a Nova York". */
+import { $, $$, reduce, clamp } from '../core/env.js';
+import { stopScroll, startScroll, scroll } from '../core/scroll.js';
 
 export function initHeader() {
   const hd = $('[data-hd]'); if (!hd) return null;
@@ -16,44 +17,34 @@ export function initHeader() {
     if (window.scrollY > end) hd.classList.add('is-solid', 'has-logo');
   };
 
-  // ---------- some depois do 2º slide (fim da abertura) e volta no topo ----------
+  // ---------- visibilidade ----------
+  const opP = () => (op ? clamp((window.scrollY - op.offsetTop) / Math.max(1, op.offsetHeight - window.innerHeight)) : 1);
   const hideFrom = () => (op ? op.offsetTop + op.offsetHeight - window.innerHeight * 0.85 : 0);
-  let hidden = false, peek = false, focusIn = false, lastY = window.scrollY, upRun = 0, leaveT = null, moveT = null;
-  const moving = () => { hd.classList.add('is-moving'); clearTimeout(moveT); moveT = setTimeout(() => hd.classList.remove('is-moving'), 760); };
+  const LOGO_END = 0.48;           // fim da travessia do O (ver opening.js)
+  let hidden = hd.classList.contains('is-hidden'), focusIn = false, lastY = window.scrollY, upRun = 0, shown = false;
   function setHidden(h) {
     if (h === hidden) return;
-    hidden = h; moving();
+    hidden = h;
     hd.classList.toggle('is-hidden', h);
   }
   function update() {
-    const y = window.scrollY;
-    const past = y > hideFrom();
-    if (!past) { peek = false; hd.classList.remove('is-peek'); setHidden(false); }
-    else if (!peek && !focusIn && menu.hidden) setHidden(true);
-    // toque: rolar para cima mostra; para baixo esconde
-    if (!fine && past) {
-      const dy = y - lastY;
-      if (dy < 0) { upRun -= dy; if (upRun > 36 && !peek) { peek = true; setHidden(false); } }
-      else if (dy > 4) { upRun = 0; if (peek && !focusIn && menu.hidden) { peek = false; setHidden(true); } }
+    const y = window.scrollY, dy = y - lastY; lastY = y;
+    if (focusIn || !menu.hidden) { setHidden(false); return; }
+    if (y <= hideFrom()) {
+      // abertura: escondido no slide do logo, visível no slide de vídeo
+      upRun = 0; shown = false;
+      setHidden(opP() < LOGO_END);
+      return;
     }
-    lastY = y;
+    // rolagem feita pelo próprio site (âncora, formulário) não conta como "subir"
+    if (scroll.auto) return;
+    // depois do slide de vídeo: some ao descer, volta ao subir
+    if (dy < 0) { upRun -= dy; if (upRun > 24) shown = true; }
+    else if (dy > 2) { upRun = 0; shown = false; }
+    setHidden(!shown);
   }
-  if (!reduce) {
-    // mouse no topo: o cabeçalho aparece; ao sair da faixa, volta a sumir
-    window.addEventListener('pointermove', (e) => {
-      if (e.pointerType !== 'mouse' || window.scrollY <= hideFrom()) return;
-      const zone = hd.offsetHeight + 28;
-      if (e.clientY <= zone) {
-        clearTimeout(leaveT);
-        if (!peek) { peek = true; hd.classList.add('is-peek'); setHidden(false); }
-      } else if (peek && e.clientY > zone + 70) {
-        clearTimeout(leaveT);
-        leaveT = setTimeout(() => { if (!focusIn && menu.hidden) { peek = false; hd.classList.remove('is-peek'); setHidden(true); } }, 420);
-      }
-    }, { passive: true });
-    document.documentElement.addEventListener('mouseleave', (e) => {
-      if (e.clientY <= 0 && window.scrollY > hideFrom()) { peek = true; hd.classList.add('is-peek'); setHidden(false); }
-    });
+  if (reduce) setHidden(false);
+  else {
     hd.addEventListener('focusin', () => { focusIn = true; setHidden(false); });
     hd.addEventListener('focusout', (e) => { if (!hd.contains(e.relatedTarget)) { focusIn = false; update(); } });
   }
@@ -78,7 +69,7 @@ export function initHeader() {
     if (!reduce) gsap.fromTo(menu, { clipPath: 'polygon(0 0, 0 0, -67% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 167% 0, 100% 100%, 0 100%)', duration: 0.6, ease: 'power3.inOut' });
     $('a', menu).focus();
   };
-  const close = (focusBack = true) => { menu.hidden = true; openBtn.setAttribute('aria-expanded', 'false'); startScroll(); if (focusBack && lastFocus) lastFocus.focus(); if (!reduce) update(); };
+  const close = (focusBack = true) => { menu.hidden = true; openBtn.setAttribute('aria-expanded', 'false'); startScroll(); if (focusBack && lastFocus) lastFocus.focus(); };
   openBtn.addEventListener('click', open);
   closeBtn.addEventListener('click', () => close());
   menu.addEventListener('keydown', (e) => {
@@ -92,15 +83,17 @@ export function initHeader() {
   $$('a', menu).forEach((a) => a.addEventListener('click', () => close(false)));
 
   // ---------- barra fixa "Quero a Nova York" no celular ----------
-  const bar = $('[data-cta-bar]'), ct = $('#contratar'), ft = $('.ft');
-  let ctVisible = false, ftVisible = false;
+  const bar = $('[data-cta-bar]'), ct = $('#contratar'), ft = $('.ft'), wp = $('.wall-pin');
+  let ctVisible = false, ftVisible = false, wpVisible = false;
+  // no telão a barra sai do caminho (legenda e progresso ficam no pé da tela)
+  if (bar && 'IntersectionObserver' in window && wp) new IntersectionObserver((es) => { wpVisible = es[0].isIntersecting; upd(); }, { rootMargin: '-40% 0px -40% 0px' }).observe(wp);
   if (bar && 'IntersectionObserver' in window && ct) new IntersectionObserver((es) => { ctVisible = es[0].isIntersecting; upd(); }, { threshold: 0 }).observe(ct);
   if (bar && 'IntersectionObserver' in window && ft) new IntersectionObserver((es) => { ftVisible = es[0].isIntersecting; upd(); }, { threshold: 0 }).observe(ft);
   const vv = window.visualViewport;
   function upd() {
     const past = op ? window.scrollY > op.offsetHeight - window.innerHeight : true;
     const kb = vv ? vv.height < window.innerHeight * 0.75 : false;
-    bar?.classList.toggle('is-on', past && !ctVisible && !ftVisible && !kb && menu.hidden);
+    bar?.classList.toggle('is-on', past && !ctVisible && !ftVisible && !wpVisible && !kb && menu.hidden);
   }
   window.addEventListener('scroll', upd, { passive: true });
   vv?.addEventListener('resize', upd);

@@ -1,7 +1,7 @@
 /* Rolagem: Lenis (só mouse/trackpad) sincronizado com o ScrollTrigger num único RAF (gsap.ticker). */
 import { reduce, fine, $ } from './env.js';
 
-export const scroll = { lenis: null };
+export const scroll = { lenis: null, auto: false };   // auto: rolagem feita pelo próprio site (âncoras, formulário)
 
 export function initScroll() {
   const { gsap, ScrollTrigger } = window;
@@ -43,17 +43,21 @@ export function goTo(target, { duration = 1.2, focus = true } = {}) {
   }
 }
 
+let autoT = null;
 export function scrollToY(top, duration = 1.2) {
   const { lenis } = scroll;
-  if (lenis) { lenis.scrollTo(top, { duration, easing: (t) => 1 - Math.pow(1 - t, 3) }); return; }
-  if (reduce) { window.scrollTo(0, top); return; }
+  scroll.auto = true; clearTimeout(autoT);
+  const done = () => { clearTimeout(autoT); autoT = setTimeout(() => { scroll.auto = false; }, 80); };
+  autoT = setTimeout(done, duration * 1000 + 400);   // garantia, caso a rolagem seja interrompida
+  if (lenis) { lenis.scrollTo(top, { duration, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done }); return; }
+  if (reduce) { window.scrollTo(0, top); done(); return; }
   const { gsap } = window;
   const o = { y: window.scrollY };
   let killed = false;
-  const kill = () => { killed = true; };
+  const kill = () => { killed = true; done(); };
   window.addEventListener('touchstart', kill, { once: true, passive: true });
   window.addEventListener('wheel', kill, { once: true, passive: true });
-  gsap.to(o, { y: top, duration, ease: 'power3.inOut', onUpdate: () => { if (!killed) window.scrollTo(0, o.y); } });
+  gsap.to(o, { y: top, duration, ease: 'power3.inOut', onUpdate: () => { if (!killed) window.scrollTo(0, o.y); }, onComplete: done });
 }
 
 export function stopScroll() { scroll.lenis?.stop(); document.documentElement.style.overflow = 'hidden'; }
