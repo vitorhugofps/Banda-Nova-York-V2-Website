@@ -2,7 +2,9 @@
    O primeiro O do logotipo é um círculo perfeito (centro 427.6, 386.1; contraforma r 84.8; anel até r 166 — coordenadas do viewBox).
    O vídeo aparece por clip-path circle com a borda escondida sob o anel branco. O logo só escala de forma uniforme (nunca gira).
    Fases por progresso p (0–1) da seção presa:
-     0–.04 repouso · .04–.50 travessia · .46–.62 feixe 56° · .58–.90 manifesto acende · .88–1 assinatura ganha largura. */
+     0–.04 repouso · .04–.50 travessia · .46–.62 feixe 56° · .58–.90 manifesto acende · .88–1 assinatura ganha largura.
+   Sem botões: a pessoa só rola. O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
+   toque ou tecla em qualquer lugar. Ele vai do começo até o fim do slide branco (A experiência). */
 import { $, $$, clamp, lerp, smooth, inOut, reduce, saveData, lowMem, config, testMode } from '../core/env.js';
 import { audio } from '../core/audio.js';
 import { bus } from '../core/bus.js';
@@ -18,7 +20,7 @@ export function initOpening() {
   const stage = $('.op__stage', sec), media = $('.op__media', sec), video = $('.op__video', sec), tint = $('.op__tint', sec);
   const svg = $('.op__logo', sec), xf = $('.op__xf', sec), scrim = $('.op__scrim', sec), feixe = $('.op__feixe', sec);
   const copy = $('.op__copy', sec), manif = $('[data-acender]', sec), assin = $('.op__assin', sec);
-  const ui = $('.op__ui', sec), skip = $('.op__skip', sec), pauseBtn = $('[data-op-pause]', sec), hd = $('[data-hd]');
+  const pauseBtn = $('[data-op-pause]', sec), hd = $('[data-hd]'), xp = $('#experiencia');
   const banda = $('.lg-banda', sec), cpNy = $('.cp-ny__p', sec), cpBl = $('.cp-bl__r', sec), cpBr = $('.cp-br__r', sec);
   const loadBars = $$('.op__load i', sec);
 
@@ -86,9 +88,6 @@ export function initOpening() {
     audio.setOpen(e);
 
     if (reduce) { hd.classList.add('has-logo'); return; }
-    // interface
-    const uiO = 1 - smooth(0.015, 0.06, p);
-    ui.style.opacity = uiO; ui.style.visibility = uiO < 0.01 ? 'hidden' : 'visible';
     hd.classList.toggle('has-logo', p > 0.44);
     hd.classList.toggle('is-solid', p > 0.6);
 
@@ -131,11 +130,13 @@ export function initOpening() {
       onUpdate: (self) => render(self.progress),
       onRefresh: (self) => { measure(); render(self.progress); },
     });
-    // som baixa quando a abertura sai
-    ScrollTrigger.create({
-      trigger: '#experiencia', start: 'top bottom', end: 'top 20%',
+    // o som segue pelo slide branco e baixa quando ele termina
+    if (xp) ScrollTrigger.create({
+      trigger: xp, start: 'bottom bottom', end: 'bottom 30%',
       onUpdate: (self) => audio.setExit(1 - smooth(0, 1, self.progress)),
-      onLeaveBack: () => audio.setExit(1),
+      onLeave: () => { audio.setExit(0); sync(); },
+      onEnterBack: () => sync(),
+      onLeaveBack: () => { audio.setExit(1); sync(); },
     });
     window.addEventListener('resize', () => { measure(); render(st.p); });
   } else {
@@ -166,7 +167,10 @@ export function initOpening() {
   }
 
   // ---------- vídeo: tocar só visível e sem outra mídia ----------
-  function wantPlay() { return useVideo && st.visible && !st.userPaused && !st.claimed && !document.hidden; }
+  // zona do som: da abertura até o fim do slide branco
+  const zoneEnd = () => (xp ? xp.offsetTop + xp.offsetHeight - window.innerHeight * 0.3 : sec.offsetTop + sec.offsetHeight);
+  const inZone = () => window.scrollY < zoneEnd();
+  function wantPlay() { return useVideo && (st.visible || (audio.on && inZone())) && !st.userPaused && !st.claimed && !document.hidden; }
   function sync() {
     if (!st.video) return;
     if (wantPlay()) { const pr = video.play(); if (pr && pr.catch) pr.catch(() => {}); } else video.pause();
@@ -198,12 +202,33 @@ export function initOpening() {
     sync();
   });
 
-  // ---------- botões ENTRAR ----------
-  $$('[data-enter]', sec).forEach((b) => b.addEventListener('click', () => {
-    if (b.dataset.enter === 'som') { st.userPaused = false; st.claimed = false; loadVideo(); audio.enable(); }
-    if (trig) scrollToY(trig.start + 0.93 * (trig.end - trig.start), 3.2);
-  }));
-  skip.addEventListener('click', () => { if (audio.on) audio.disable(); });
+  // ---------- som sem botão ----------
+  // 1) se o navegador já libera som automático para o site, liga direto;
+  // 2) senão, liga no primeiro gesto (clique, toque ou tecla), desde que a pessoa ainda esteja na zona do som.
+  function soundAllowed() {
+    try { if (navigator.getAutoplayPolicy) return navigator.getAutoplayPolicy('mediaelement') === 'allowed'; } catch (e) { /* opcional */ }
+    try {
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return false;
+      const c = new C(); const ok = c.state === 'running'; c.close?.(); return ok;
+    } catch (e) { return false; }
+  }
+  const GESTOS = ['pointerdown', 'keydown', 'touchend'];
+  const listen = () => GESTOS.forEach((ev) => window.addEventListener(ev, unlock, { capture: true, passive: true }));
+  audio.onFail = () => { if (inZone()) listen(); };
+  function unlock(e) {
+    if (e && e.type === 'keydown' && (e.key === 'Escape' || e.metaKey || e.ctrlKey)) return;
+    // rolar com o dedo não conta como gesto: espera um toque de verdade
+    if (navigator.userActivation && !navigator.userActivation.isActive) return;
+    GESTOS.forEach((ev) => window.removeEventListener(ev, unlock, true));
+    if (!useVideo || audio.on || !inZone()) return;
+    st.claimed = false; loadVideo(); audio.enable({ play: !st.userPaused });
+    sync();
+  }
+  if (useVideo && !reduce) {
+    if (soundAllowed()) { loadVideo(); audio.enable({ play: true }); }
+    else listen();
+    window.addEventListener('scroll', () => { if (audio.on && !st.visible) sync(); }, { passive: true });
+  }
 
   // ---------- movimento reduzido: vídeo sob demanda ----------
   const watch = $('[data-watch]', sec), dlg = $('[data-opd]');

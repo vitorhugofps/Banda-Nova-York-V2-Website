@@ -1,22 +1,66 @@
-/* Cabeçalho: estado sobre o palco, link ativo, botão de som (barras /// reagem ao áudio), menu e barra fixa do celular. */
-import { $, $$, reduce } from '../core/env.js';
-import { audio } from '../core/audio.js';
-import { bus } from '../core/bus.js';
+/* Cabeçalho: entra animado depois da montagem do logo, fica sobre a abertura e some com blur preto depois do 2º slide.
+   Volta quando o mouse vai até o topo da tela (no toque, quando a pessoa rola para cima) e quando recebe foco pelo teclado.
+   Também cuida do link ativo, do menu do celular e da barra fixa "Quero a Nova York". */
+import { $, $$, reduce, fine } from '../core/env.js';
 import { stopScroll, startScroll } from '../core/scroll.js';
 
 export function initHeader() {
-  const hd = $('[data-hd]'); if (!hd) return;
+  const hd = $('[data-hd]'); if (!hd) return null;
   const { gsap } = window;
   const op = $('#abertura');
+  const menu = $('#menu'), openBtn = $('[data-menu-open]'), closeBtn = $('[data-menu-close]');
 
   // fora da abertura o cabeçalho é sempre sólido e mostra o logo
   const solid = () => {
-    const end = op ? op.offsetHeight - window.innerHeight * 0.4 : 0;
+    const end = op ? op.offsetTop + op.offsetHeight - window.innerHeight * 0.4 : 0;
     if (window.scrollY > end) hd.classList.add('is-solid', 'has-logo');
   };
-  window.addEventListener('scroll', solid, { passive: true }); solid();
 
-  // link ativo
+  // ---------- some depois do 2º slide (fim da abertura) e volta no topo ----------
+  const hideFrom = () => (op ? op.offsetTop + op.offsetHeight - window.innerHeight * 0.85 : 0);
+  let hidden = false, peek = false, focusIn = false, lastY = window.scrollY, upRun = 0, leaveT = null, moveT = null;
+  const moving = () => { hd.classList.add('is-moving'); clearTimeout(moveT); moveT = setTimeout(() => hd.classList.remove('is-moving'), 760); };
+  function setHidden(h) {
+    if (h === hidden) return;
+    hidden = h; moving();
+    hd.classList.toggle('is-hidden', h);
+  }
+  function update() {
+    const y = window.scrollY;
+    const past = y > hideFrom();
+    if (!past) { peek = false; hd.classList.remove('is-peek'); setHidden(false); }
+    else if (!peek && !focusIn && menu.hidden) setHidden(true);
+    // toque: rolar para cima mostra; para baixo esconde
+    if (!fine && past) {
+      const dy = y - lastY;
+      if (dy < 0) { upRun -= dy; if (upRun > 36 && !peek) { peek = true; setHidden(false); } }
+      else if (dy > 4) { upRun = 0; if (peek && !focusIn && menu.hidden) { peek = false; setHidden(true); } }
+    }
+    lastY = y;
+  }
+  if (!reduce) {
+    // mouse no topo: o cabeçalho aparece; ao sair da faixa, volta a sumir
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || window.scrollY <= hideFrom()) return;
+      const zone = hd.offsetHeight + 28;
+      if (e.clientY <= zone) {
+        clearTimeout(leaveT);
+        if (!peek) { peek = true; hd.classList.add('is-peek'); setHidden(false); }
+      } else if (peek && e.clientY > zone + 70) {
+        clearTimeout(leaveT);
+        leaveT = setTimeout(() => { if (!focusIn && menu.hidden) { peek = false; hd.classList.remove('is-peek'); setHidden(true); } }, 420);
+      }
+    }, { passive: true });
+    document.documentElement.addEventListener('mouseleave', (e) => {
+      if (e.clientY <= 0 && window.scrollY > hideFrom()) { peek = true; hd.classList.add('is-peek'); setHidden(false); }
+    });
+    hd.addEventListener('focusin', () => { focusIn = true; setHidden(false); });
+    hd.addEventListener('focusout', (e) => { if (!hd.contains(e.relatedTarget)) { focusIn = false; update(); } });
+  }
+  window.addEventListener('scroll', () => { solid(); if (!reduce) update(); }, { passive: true });
+  solid(); if (!reduce) update();
+
+  // ---------- link ativo ----------
   const links = $$('.hd__nav a');
   const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
   if ('IntersectionObserver' in window) {
@@ -27,39 +71,14 @@ export function initHeader() {
     ['experiencia', 'momentos', 'videos', 'media-kit', 'contratar'].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
   }
 
-  // som
-  const snd = $('[data-sound]'), sndState = $('[data-sound-state]'), bars = $$('.snd__bars i', snd);
-  snd.addEventListener('click', () => {
-    if (audio.on) audio.disable();
-    else { audio.enable({ play: op && op.getBoundingClientRect().bottom > 0 }); }
-  });
-  let ytPlaying = false;
-  bus.on('sound', (on) => { snd.setAttribute('aria-pressed', String(on)); sndState.textContent = on ? ' ligado' : ' desligado'; });
-  bus.on('yt:state', (s) => { ytPlaying = s === 'playing'; });
-  // equalizador: o ângulo de 56° é mantido (skewX antes de scaleY)
-  const k = [0.35, 0.35, 0.35];
-  let acc = 0;
-  gsap.ticker.add((t, dt) => {
-    acc += dt; if (acc < 33) return; acc = 0;
-    const b = audio.bands();
-    for (let i = 0; i < 3; i++) {
-      let target = 0.35;
-      if (b) target = 0.2 + 0.8 * Math.min(1, b[i] * (i === 2 ? 2.2 : 1.3));
-      const att = target > k[i] ? 0.6 : 0.15;
-      k[i] += (target - k[i]) * att;
-      bars[i].style.setProperty('--k', k[i].toFixed(3));
-    }
-  });
-
-  // menu (celular/tablet)
-  const menu = $('#menu'), openBtn = $('[data-menu-open]'), closeBtn = $('[data-menu-close]');
+  // ---------- menu (celular/tablet) ----------
   let lastFocus = null;
   const open = () => {
     lastFocus = document.activeElement; menu.hidden = false; openBtn.setAttribute('aria-expanded', 'true'); stopScroll();
     if (!reduce) gsap.fromTo(menu, { clipPath: 'polygon(0 0, 0 0, -67% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 167% 0, 100% 100%, 0 100%)', duration: 0.6, ease: 'power3.inOut' });
     $('a', menu).focus();
   };
-  const close = (focusBack = true) => { menu.hidden = true; openBtn.setAttribute('aria-expanded', 'false'); startScroll(); if (focusBack && lastFocus) lastFocus.focus(); };
+  const close = (focusBack = true) => { menu.hidden = true; openBtn.setAttribute('aria-expanded', 'false'); startScroll(); if (focusBack && lastFocus) lastFocus.focus(); if (!reduce) update(); };
   openBtn.addEventListener('click', open);
   closeBtn.addEventListener('click', () => close());
   menu.addEventListener('keydown', (e) => {
@@ -72,7 +91,7 @@ export function initHeader() {
   });
   $$('a', menu).forEach((a) => a.addEventListener('click', () => close(false)));
 
-  // barra fixa "Quero a Nova York" no celular
+  // ---------- barra fixa "Quero a Nova York" no celular ----------
   const bar = $('[data-cta-bar]'), ct = $('#contratar'), ft = $('.ft');
   let ctVisible = false, ftVisible = false;
   if (bar && 'IntersectionObserver' in window && ct) new IntersectionObserver((es) => { ctVisible = es[0].isIntersecting; upd(); }, { threshold: 0 }).observe(ct);
@@ -86,4 +105,6 @@ export function initHeader() {
   window.addEventListener('scroll', upd, { passive: true });
   vv?.addEventListener('resize', upd);
   upd();
+
+  return { get hidden() { return hidden; }, show: () => setHidden(false), hide: () => setHidden(true) };
 }

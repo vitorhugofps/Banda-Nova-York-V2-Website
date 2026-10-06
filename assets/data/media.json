@@ -37,14 +37,7 @@
      "h": 1600,
      "src": "/assets/media/img/oriente-3339-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_oriente-3339.jpg",
-    "name": "BNY_Palco_oriente-3339.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 673775
-   }
+   ]
   },
   {
    "id": "feixes-3341",
@@ -81,14 +74,7 @@
      "h": 1600,
      "src": "/assets/media/img/feixes-3341-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_feixes-3341.jpg",
-    "name": "BNY_Palco_feixes-3341.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 680477
-   }
+   ]
   },
   {
    "id": "palco-3336",
@@ -125,14 +111,7 @@
      "h": 1600,
      "src": "/assets/media/img/palco-3336-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_palco-3336.jpg",
-    "name": "BNY_Palco_palco-3336.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 730852
-   }
+   ]
   },
   {
    "id": "palco-3331",
@@ -169,14 +148,7 @@
      "h": 1600,
      "src": "/assets/media/img/palco-3331-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_palco-3331.jpg",
-    "name": "BNY_Palco_palco-3331.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 678340
-   }
+   ]
   },
   {
    "id": "oriente-3342",
@@ -213,14 +185,7 @@
      "h": 2400,
      "src": "/assets/media/img/oriente-3342-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_oriente-3342.jpg",
-    "name": "BNY_Palco_oriente-3342.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 567753
-   }
+   ]
   },
   {
    "id": "oriente-3345",
@@ -257,14 +222,7 @@
      "h": 2400,
      "src": "/assets/media/img/oriente-3345-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_oriente-3345.jpg",
-    "name": "BNY_Palco_oriente-3345.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 597057
-   }
+   ]
   },
   {
    "id": "guitarras-3350",
@@ -301,14 +259,7 @@
      "h": 1600,
      "src": "/assets/media/img/guitarras-3350-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_guitarras-3350.jpg",
-    "name": "BNY_Palco_guitarras-3350.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 606964
-   }
+   ]
   },
   {
    "id": "guitarras-3349",
@@ -345,14 +296,7 @@
      "h": 2400,
      "src": "/assets/media/img/guitarras-3349-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_guitarras-3349.jpg",
-    "name": "BNY_Palco_guitarras-3349.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 691834
-   }
+   ]
   },
   {
    "id": "disco-3352",
@@ -389,14 +333,7 @@
      "h": 1600,
      "src": "/assets/media/img/disco-3352-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_disco-3352.jpg",
-    "name": "BNY_Palco_disco-3352.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 838164
-   }
+   ]
   },
   {
    "id": "disco-3351",
@@ -433,14 +370,7 @@
      "h": 1600,
      "src": "/assets/media/img/disco-3351-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_disco-3351.jpg",
-    "name": "BNY_Palco_disco-3351.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 721020
-   }
+   ]
   },
   {
    "id": "anos70-3353",
@@ -477,14 +407,7 @@
      "h": 1600,
      "src": "/assets/media/img/anos70-3353-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_anos70-3353.jpg",
-    "name": "BNY_Palco_anos70-3353.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 674155
-   }
+   ]
   },
   {
    "id": "anos70-3356",
@@ -521,14 +444,7 @@
      "h": 1600,
      "src": "/assets/media/img/anos70-3356-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_anos70-3356.jpg",
-    "name": "BNY_Palco_anos70-3356.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 659838
-   }
+   ]
   },
   {
    "id": "pop-3359",
@@ -565,14 +481,7 @@
      "h": 1600,
      "src": "/assets/media/img/pop-3359-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_pop-3359.jpg",
-    "name": "BNY_Publico_pop-3359.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 552605
-   }
+   ]
   },
   {
    "id": "pop-3360",
@@ -609,14 +518,7 @@
      "h": 2400,
      "src": "/assets/media/img/pop-3360-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_pop-3360.jpg",
-    "name": "BNY_Palco_pop-3360.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 419642
-   }
+   ]
   },
   {
    "id": "pop-3361",
@@ -653,14 +555,7 @@
      "h": 2400,
      "src": "/assets/media/img/pop-3361-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_pop-3361.jpg",
-    "name": "BNY_Palco_pop-3361.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 401606
-   }
+   ]
   },
   {
    "id": "bateria-3357",
@@ -697,14 +592,7 @@
      "h": 2400,
      "src": "/assets/media/img/bateria-3357-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_bateria-3357.jpg",
-    "name": "BNY_Palco_bateria-3357.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 597225
-   }
+   ]
   },
   {
    "id": "country-3365",
@@ -741,14 +629,7 @@
      "h": 1600,
      "src": "/assets/media/img/country-3365-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_country-3365.jpg",
-    "name": "BNY_Palco_country-3365.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 419121
-   }
+   ]
   },
   {
    "id": "country-3364",
@@ -785,14 +666,7 @@
      "h": 2400,
      "src": "/assets/media/img/country-3364-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Palco_country-3364.jpg",
-    "name": "BNY_Palco_country-3364.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 544683
-   }
+   ]
   },
   {
    "id": "boteco-3375",
@@ -829,14 +703,7 @@
      "h": 1600,
      "src": "/assets/media/img/boteco-3375-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_boteco-3375.jpg",
-    "name": "BNY_Publico_boteco-3375.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 755847
-   }
+   ]
   },
   {
    "id": "boteco-3367",
@@ -873,14 +740,7 @@
      "h": 1600,
      "src": "/assets/media/img/boteco-3367-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_boteco-3367.jpg",
-    "name": "BNY_Publico_boteco-3367.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 693394
-   }
+   ]
   },
   {
    "id": "boteco-3383",
@@ -917,14 +777,7 @@
      "h": 2400,
      "src": "/assets/media/img/boteco-3383-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_boteco-3383.jpg",
-    "name": "BNY_Publico_boteco-3383.jpg",
-    "w": 1706,
-    "h": 2560,
-    "bytes": 718723
-   }
+   ]
   },
   {
    "id": "pista-3358",
@@ -961,14 +814,7 @@
      "h": 1600,
      "src": "/assets/media/img/pista-3358-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_pista-3358.jpg",
-    "name": "BNY_Publico_pista-3358.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 438442
-   }
+   ]
   },
   {
    "id": "pista-3382",
@@ -1005,14 +851,44 @@
      "h": 1600,
      "src": "/assets/media/img/pista-3382-2400.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Publico_pista-3382.jpg",
-    "name": "BNY_Publico_pista-3382.jpg",
-    "w": 2560,
-    "h": 1706,
-    "bytes": 354017
-   }
+   ]
+  },
+  {
+   "id": "publico-3368",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.56,
+    "y": 0.42
+   },
+   "pos": "56% 42%",
+   "bg": "#28211f",
+   "alt": "Convidados à mesa do Boteco Nova York levantam os braços e cantam com os artistas",
+   "moment": "pista",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/publico-3368-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/publico-3368-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/publico-3368-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/publico-3368-2400.webp"
+    }
+   ]
   },
   {
    "id": "elenco-branco",
@@ -1044,14 +920,7 @@
      "h": 1200,
      "src": "/assets/media/img/elenco-branco-1600.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Estudio_elenco-branco.jpg",
-    "name": "BNY_Estudio_elenco-branco.jpg",
-    "w": 2172,
-    "h": 1629,
-    "bytes": 652251
-   }
+   ]
   },
   {
    "id": "elenco-branco-pb",
@@ -1083,14 +952,7 @@
      "h": 1200,
      "src": "/assets/media/img/elenco-branco-pb-1600.webp"
     }
-   ],
-   "dl": {
-    "src": "/assets/media/dl/BNY_Estudio_elenco-branco-pb.jpg",
-    "name": "BNY_Estudio_elenco-branco-pb.jpg",
-    "w": 2172,
-    "h": 1629,
-    "bytes": 657363
-   }
+   ]
   }
  ]
 }

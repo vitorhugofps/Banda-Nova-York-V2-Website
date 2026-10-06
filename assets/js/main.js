@@ -6,7 +6,7 @@ import { audio } from './core/audio.js';
 import { registrarOrigem } from './core/origem.js';
 import { initOpening } from './scenes/opening.js';
 import { initHeader } from './scenes/header.js';
-import { initReveals, initExperiencia, initAssinatura, initMomentos, initShowUnico, initEmpresas, initVideoStage } from './scenes/sections.js';
+import { initReveals, initExperiencia, initAssinatura, initMomentos, initFiguras, initShowUnico, initEmpresas, initVideoStage, initFooter } from './scenes/sections.js';
 
 registrarOrigem();
 
@@ -21,13 +21,15 @@ function boot() {
   initScroll();
   // cenas com palco preso primeiro, na ordem do DOM
   const opening = initOpening();
-  initHeader();
+  const header = initHeader();
   initExperiencia();
   initAssinatura();
   initMomentos();
+  initFiguras();
   initShowUnico();
   initEmpresas();
   initVideoStage();
+  initFooter();
   initReveals();
   document.fonts?.ready.then(() => window.ScrollTrigger.refresh());
   window.addEventListener('load', () => window.ScrollTrigger.refresh());
@@ -49,7 +51,7 @@ function boot() {
     if (t) setTimeout(() => import('./core/scroll.js').then((s) => s.goTo(t, { duration: 0.01, focus: false })), 300);
   }
   $$('[data-year]').forEach((e) => { e.textContent = new Date().getFullYear(); });
-  if (testMode) Object.assign((window.__NY__ ||= {}), { lenis: scroll.lenis, audio, opening, reduce });
+  if (testMode) Object.assign((window.__NY__ ||= {}), { lenis: scroll.lenis, audio, opening, header, reduce });
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

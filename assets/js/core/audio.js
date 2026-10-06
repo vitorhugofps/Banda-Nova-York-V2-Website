@@ -34,11 +34,14 @@ class OpeningAudio {
     const ok = this._graph();
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* opcional */ }
     this.video.muted = false;
-    if (play) { const p = this.video.play(); if (p && p.catch) p.catch(() => {}); }
     if (ok) { this.ctx.resume(); this.master.gain.setTargetAtTime(0.9, this.ctx.currentTime, 0.12); }
     this.on = true; this.state = ok ? 'running' : 'element';
     bus.emit('sound', true);
     bus.emit('media:claim', 'opening');
+    // o navegador recusou som sem gesto: volta ao vídeo mudo e avisa quem chamou
+    const fail = () => { this.video.muted = true; this.on = false; this.state = 'blocked'; bus.emit('sound', false); const q = this.video.play(); if (q && q.catch) q.catch(() => {}); this.onFail?.(); };
+    if (play) { const p = this.video.play(); if (p && p.catch) p.catch(fail); }
+    else if (this.ctx && this.ctx.state !== 'running') this.ctx.resume().catch?.(fail);
   }
   disable() {
     if (!this.video) return;

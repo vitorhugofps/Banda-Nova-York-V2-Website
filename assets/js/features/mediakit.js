@@ -1,9 +1,8 @@
 /* MEDIA KIT · banco de imagens
    - Telão de LED curvo em 3D (CSS): câmera no centro de um anel de fotos; gira com a rolagem e com o arraste.
-   - Grade com recortes por ponto focal, filtros (GSAP Flip), lightbox acessível e ZIP montado no navegador. */
+   - Grade com recortes por ponto focal, filtros (GSAP Flip) e lightbox acessível. O site não oferece download das fotos. */
 import { $, $$, clamp, reduce, mq, once, RUN, testMode } from '../core/env.js';
 import { stopScroll, startScroll } from '../core/scroll.js';
-import { makeZip } from './zip.js';
 
 export async function initMediaKit() {
   const sec = $('#media-kit'); if (!sec) return;
@@ -44,7 +43,7 @@ export async function initMediaKit() {
   }));
 
   // ---------- lightbox ----------
-  const lb = $('[data-lb]'), stage = $('[data-lb-stage]', lb), cap = $('[data-lb-cap]', lb), dl = $('[data-lb-dl]', lb);
+  const lb = $('[data-lb]'), stage = $('[data-lb-stage]', lb), cap = $('[data-lb-cap]', lb);
   const iEl = $('[data-lb-i]', lb), nEl = $('[data-lb-n]', lb);
   let seq = [], at = 0, opener = null;
   const visibleIds = () => cells.filter((c) => !c.classList.contains('is-out') && getComputedStyle(c).display !== 'none').map((c) => c.dataset.id);
@@ -53,7 +52,7 @@ export async function initMediaKit() {
     at = (i + seq.length) % seq.length;
     const m = byId.get(seq[at]);
     const im = new Image();
-    im.className = 'lb__img'; im.alt = m.alt; im.decoding = 'async'; im.sizes = '100vw'; im.srcset = srcset(m); im.src = m.sizes[m.sizes.length - 1].src;
+    im.className = 'lb__img'; im.alt = m.alt; im.decoding = 'async'; im.draggable = false; im.sizes = '100vw'; im.srcset = srcset(m); im.src = m.sizes[m.sizes.length - 1].src;
     const old = $('.lb__img', stage);
     if (!reduce) { im.classList.add('is-enter'); im.style.setProperty('--kr', '.4'); }
     stage.appendChild(im);
@@ -61,8 +60,6 @@ export async function initMediaKit() {
     if (reduce) old?.remove(); else if (im.complete) reveal(); else { im.onload = reveal; im.onerror = reveal; }
     iEl.textContent = String(at + 1).padStart(2, '0'); nEl.textContent = String(seq.length).padStart(2, '0');
     cap.textContent = `${m.alt} · ${data.credit}`;
-    dl.href = m.dl.src; dl.setAttribute('download', m.dl.name);
-    dl.innerHTML = `Baixar em alta <span class="sr-only">(JPG, ${(m.dl.bytes / 1e6).toFixed(1).replace('.', ',')} MB)</span>` + dl.innerHTML.slice(dl.innerHTML.indexOf('<svg'));
     [1, -1].forEach((d) => { const n = byId.get(seq[(at + d + seq.length) % seq.length]); const p = new Image(); p.sizes = '100vw'; p.srcset = srcset(n); });
     if (history.replaceState) history.replaceState(null, '', `#foto=${m.id}`);
   }
@@ -101,29 +98,8 @@ export async function initMediaKit() {
   const hash = location.hash.match(/^#foto=([\w-]+)/);
   if (hash && byId.has(hash[1])) setTimeout(() => open(hash[1]), 400);
 
-  // ---------- ZIP com todas as fotos ----------
-  const zipBtn = $('[data-zip]', sec), zipStatus = $('.mk__zip-status', sec);
-  zipBtn?.addEventListener('click', async () => {
-    if (zipBtn.disabled) return;
-    zipBtn.disabled = true;
-    const files = [];
-    try {
-      for (let i = 0; i < data.items.length; i++) {
-        const m = data.items[i];
-        zipStatus.textContent = `Preparando as fotos: ${i + 1} de ${data.items.length}…`;
-        const buf = new Uint8Array(await (await fetch(m.dl.src)).arrayBuffer());
-        files.push({ name: `BANDA_NOVA_YORK_FOTOS/${m.cat.toUpperCase()}/${m.dl.name}`, data: buf });
-      }
-      files.push({ name: 'BANDA_NOVA_YORK_FOTOS/LEIA-ME.txt', data: new TextEncoder().encode(LEIA) });
-      const blob = makeZip(files);
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Banda_Nova_York_Media_Kit_Fotos.zip';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
-      zipStatus.textContent = 'Pronto: o download do media kit começou.';
-    } catch (e) {
-      zipStatus.textContent = 'Não foi possível montar o arquivo agora. Baixe as fotos uma a uma pelo ícone de download.';
-    } finally { zipBtn.disabled = false; }
-  });
+  // sem menu de "salvar imagem" nas fotos do banco
+  [stage, grid].forEach((el) => el.addEventListener('contextmenu', (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); }));
 
   // ---------- TELÃO 3D ----------
   initWall(sec, (id, el) => open(id, el));
@@ -190,16 +166,3 @@ function initWall(sec, onOpen) {
     wall.addEventListener('click', (e) => { const el = hit(e.clientX, e.clientY); if (el) onOpen(el.dataset.open, $(`[data-open="${el.dataset.open}"]`, $('[data-mk-grid]'))); });
   }
 }
-
-const LEIA = `BANDA NOVA YORK · MEDIA KIT (fotos oficiais)
-
-Uso liberado para imprensa e divulgação de apresentações da Banda Nova York.
-Crédito obrigatório: Divulgação · Banda Nova York.
-
-Por favor:
-- não altere, distorça ou aplique filtros nas fotos;
-- não aplique o logotipo sobre os artistas (use fundo com contraste);
-- logos oficiais e regras de uso: baixe "Logos oficiais (.zip)" no site.
-
-Contratação: WhatsApp (34) 99993-8787 · @bandanovayork
-`;

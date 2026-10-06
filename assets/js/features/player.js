@@ -1,9 +1,10 @@
 /* PALCO DIGITAL · player próprio sobre a IFrame API do YouTube.
-   - Lista "Últimos vídeos": /api/videos (RSS do canal, cache na Vercel) → assets/data/videos.json → itens estáticos do HTML.
+   - Lista "Últimos vídeos": /api/videos (RSS ou playlist do canal, cache na Vercel) → assets/data/videos.json → itens estáticos do HTML.
+   - O quadro acompanha o formato do vídeo: 16:9 para horizontal e 9:16 para vertical (Shorts), com transição animada.
    - Modo "clean" (padrão): iframe sem controles, sem cliques e recortado (60 px acima e abaixo), capa/controles/estados da marca.
    - Modo "compat": iframe inteiro, sem nada por cima (configurável em ny-config.playerMode).
    Máquina de estados: idle → arming → ready → playing ⇄ paused · buffering · ended · blocked/unavailable/error. */
-import { $, $$, clamp, config, testMode } from '../core/env.js';
+import { $, $$, clamp, config, testMode, reduce } from '../core/env.js';
 import { bus } from '../core/bus.js';
 
 const CACHE = 'ny-videos-v1', CACHE_MS = 6 * 3600e3;
@@ -124,9 +125,47 @@ export function initPlayer() {
       if (on) $('.pl__id', a).insertAdjacentHTML('beforeend', '<span class="pl__playing">· No palco</span>');
     });
   }
+  // ---------- formato do quadro ----------
+  let painted = false;
+  function target() {
+    const v = S.items[S.idx]; const vert = !!(v && v.isShort);
+    const cw = root.clientWidth || screen.parentElement.clientWidth || 640;
+    if (!vert) return { w: cw, h: Math.round((cw * 9) / 16), vert };
+    const desk = window.innerWidth >= 1024;
+    // o quadro e os controles cabem inteiros na tela (no celular, acima da barra fixa)
+    const barH = desk ? 58 : 108, cta = desk ? 0 : 64;
+    const maxH = Math.max(320, Math.min(window.innerHeight - barH - cta - (desk ? 56 : 40), 860));
+    const h = Math.round(Math.min(maxH, (cw * 16) / 9));
+    return { w: Math.round((h * 9) / 16), h, vert };
+  }
+  let tween = null;
+  function fit(animate) {
+    const t = target();
+    root.classList.toggle('is-vertical', t.vert);
+    root.classList.toggle('is-narrow', t.w < 640);
+    const follow = () => { root.style.setProperty('--pl-w', `${screen.offsetWidth}px`); syncListHeight(); };
+    tween?.kill?.();
+    if (animate && window.gsap && !reduce) {
+      tween = window.gsap.to(screen, { width: t.w, height: t.h, duration: 0.75, ease: 'power3.inOut', onUpdate: follow, onComplete: () => { follow(); window.ScrollTrigger?.refresh(); keepInView(); } });
+    } else { screen.style.width = `${t.w}px`; screen.style.height = `${t.h}px`; follow(); }
+  }
+  // depois de trocar o formato, o quadro inteiro (com os controles) fica na tela
+  function keepInView() {
+    const r = root.getBoundingClientRect(), top = r.top + window.scrollY;
+    const bottom = r.top + screen.offsetHeight + 58;
+    if (r.top >= 0 && bottom <= window.innerHeight) return;
+    import('../core/scroll.js').then((m) => m.scrollToY(Math.max(0, top - 20), 0.8));
+  }
+  let rz = null;
+  window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => fit(false), 120); });
+
   function paintCover() {
     const v = S.items[S.idx]; if (!v) return;
-    screen.dataset.orient = v.isShort ? 'v' : 'h';
+    const orient = v.isShort ? 'v' : 'h';
+    const changed = screen.dataset.orient !== orient;
+    screen.dataset.orient = orient;
+    if (changed || !painted) fit(painted && changed);
+    painted = true;
     tEl.textContent = v.title;
     dEl.textContent = `${v.isShort ? 'Vertical' : 'Vídeo'} · ${relDate(v.publishedAt)}`;
     badge.hidden = !isNew(v.publishedAt);
@@ -142,9 +181,8 @@ export function initPlayer() {
   }
   function syncListHeight() {
     const aside = list.closest('.vd__list');
-    if (window.innerWidth >= 1024) aside.style.setProperty('--list-h', `${root.offsetHeight}px`);
+    if (window.innerWidth >= 1024) aside.style.setProperty('--list-h', `${Math.max(root.offsetHeight, 420)}px`);
   }
-  window.addEventListener('resize', syncListHeight);
 
   async function loadData() {
     try { const c = JSON.parse(localStorage.getItem(CACHE) || 'null'); if (c && Date.now() - c.t < CACHE_MS) apply(c.d, 'cache'); } catch (e) { /* sem storage */ }
@@ -239,8 +277,8 @@ export function initPlayer() {
     let guard = 0; while (S.dead.has(S.items[i].id) && guard++ < n) i = (i + 1) % n;
     const changedOrient = S.items[i].isShort !== S.items[S.idx]?.isShort;
     S.idx = i; S.retry = 0; hideState();
-    if (changedOrient && window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.gsap.fromTo(screen, { clipPath: 'polygon(0 0, 0 0, -60% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 160% 0, 100% 100%, 0 100%)', duration: 0.5, ease: 'power3.inOut', clearProps: 'clipPath' });
+    if (changedOrient && window.gsap && !reduce) {
+      window.gsap.fromTo(thumb, { clipPath: 'polygon(0 0, 0 0, -60% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 160% 0, 100% 100%, 0 100%)', duration: 0.7, delay: 0.15, ease: 'power3.inOut', clearProps: 'clipPath' });
     }
     paintCover();
     prog.style.setProperty('--p', '0%'); cur.textContent = '00:00'; dur.textContent = '00:00';
@@ -276,7 +314,7 @@ export function initPlayer() {
     root.classList.toggle('is-muted', m); bMute.setAttribute('aria-pressed', String(m)); bMute.setAttribute('aria-label', m ? 'Ativar som' : 'Silenciar');
   });
   vol.addEventListener('input', () => { if (S.player?.setVolume) { S.player.setVolume(+vol.value); if (+vol.value > 0 && S.player.isMuted()) { S.player.unMute(); root.classList.remove('is-muted'); } } });
-  list.addEventListener('click', (e) => { const a = e.target.closest('.pl__item'); if (!a) return; e.preventDefault(); go(+a.dataset.i, true); root.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }); });
+  list.addEventListener('click', (e) => { const a = e.target.closest('.pl__item'); if (!a) return; e.preventDefault(); go(+a.dataset.i, true); setTimeout(keepInView, 60); });
   // tela cheia (no iPhone, abre no YouTube)
   const canFs = !!(screen.requestFullscreen || screen.webkitRequestFullscreen) && document.fullscreenEnabled !== false;
   bFs.addEventListener('click', () => {

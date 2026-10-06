@@ -4,6 +4,8 @@
    2. Página da playlist de envios do canal, quando o RSS falha (o RSS do YouTube cai de tempos em tempos desde 2025).
    3. assets/data/videos.json, a lista de reserva.
    Títulos curados e o vídeo em destaque vêm sempre de assets/data/videos.json.
+   O formato de cada vídeo (vertical ou horizontal) é conferido no oEmbed do YouTube pelo endereço /shorts/:
+   ele responde 113×200 para vídeos verticais e 200×113 para horizontais. O player usa isso para mudar o quadro.
    Cache na borda: 30 min (s-maxage) + 1 dia servindo o anterior enquanto revalida. ?debug=1 mostra o diagnóstico, sem cache. */
 const fs = require('fs');
 const path = require('path');
@@ -119,13 +121,24 @@ function readStatic() {
   }
 }
 
-async function get(url, accept) {
+async function get(url, accept, ms = 3000) {
   const r = await fetch(url, {
-    signal: AbortSignal.timeout(3500),
+    signal: AbortSignal.timeout(ms),
     headers: { 'user-agent': UA, accept, 'accept-language': 'en-US,en;q=0.9', cookie: 'CONSENT=YES+cb; SOCS=CAI' },
   });
   if (!r.ok) throw new Error(String(r.status));
   return r.text();
+}
+
+// confere vertical × horizontal de cada vídeo (em paralelo; se falhar, mantém o que já se sabia)
+async function checkFormat(items) {
+  await Promise.all(items.slice(0, MAX).map(async (it) => {
+    try {
+      const j = JSON.parse(await get(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent('https://www.youtube.com/shorts/' + it.id)}`, 'application/json', 2500));
+      if (j && j.width && j.height) it.isShort = j.height > j.width;
+    } catch (e) { /* mantém */ }
+  }));
+  return items;
 }
 
 module.exports = async function handler(req, res) {
@@ -148,6 +161,7 @@ module.exports = async function handler(req, res) {
   try {
     const items = parseFeed(await get(`https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL}`, 'application/atom+xml,text/xml'));
     if (!items.length) throw new Error('vazio');
+    await checkFormat(items);
     return send({ ...common, source: 'rss', items: withExtras(items) }, 'public, s-maxage=1800, stale-while-revalidate=86400');
   } catch (e) { tried.push('rss ' + (e && e.message || e)); }
 
@@ -155,6 +169,7 @@ module.exports = async function handler(req, res) {
     const page = parsePlaylistPage(await get(`https://www.youtube.com/playlist?list=${UPLOADS}&hl=en&gl=US`, 'text/html'), now);
     const items = mergeKnown(page.slice(0, MAX), base, now);
     if (items.length < 3) throw new Error('lista curta (' + items.length + ')');
+    await checkFormat(items);
     return send({ ...common, source: 'canal', items: withExtras(items) }, 'public, s-maxage=1800, stale-while-revalidate=86400');
   } catch (e) { tried.push('canal ' + (e && e.message || e)); }
 
@@ -163,3 +178,4 @@ module.exports = async function handler(req, res) {
 
 module.exports.parseFeed = parseFeed;
 module.exports.parsePlaylistPage = parsePlaylistPage;
+module.exports.checkFormat = checkFormat;
