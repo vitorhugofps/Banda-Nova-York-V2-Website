@@ -1,0 +1,226 @@
+[
+ {
+  "id": "01_algar",
+  "nome": "Algar",
+  "src": "/assets/media/clientes/01_algar.webp",
+  "w": 207,
+  "h": 79,
+  "publicar": true
+ },
+ {
+  "id": "02_cdl",
+  "nome": "CDL",
+  "src": "/assets/media/clientes/02_cdl.webp",
+  "w": 211,
+  "h": 78,
+  "publicar": true
+ },
+ {
+  "id": "03_disney",
+  "nome": "Disney",
+  "src": "/assets/media/clientes/03_disney.webp",
+  "w": 212,
+  "h": 96,
+  "publicar": true
+ },
+ {
+  "id": "04_unimed",
+  "nome": "Unimed",
+  "src": "/assets/media/clientes/04_unimed.webp",
+  "w": 231,
+  "h": 80,
+  "publicar": true
+ },
+ {
+  "id": "05_caramuru",
+  "nome": "Caramuru Alimentos",
+  "src": "/assets/media/clientes/05_caramuru.webp",
+  "w": 213,
+  "h": 100,
+  "publicar": true
+ },
+ {
+  "id": "06_rio_quente",
+  "nome": "Rio Quente Resorts",
+  "src": "/assets/media/clientes/06_rio_quente.webp",
+  "w": 164,
+  "h": 109,
+  "publicar": true
+ },
+ {
+  "id": "07_kraft",
+  "nome": "Kraft",
+  "src": "/assets/media/clientes/07_kraft.webp",
+  "w": 214,
+  "h": 89,
+  "publicar": true
+ },
+ {
+  "id": "08_sicoob",
+  "nome": "Sicoob",
+  "src": "/assets/media/clientes/08_sicoob.webp",
+  "w": 221,
+  "h": 92,
+  "publicar": true
+ },
+ {
+  "id": "09_caixa",
+  "nome": "Caixa",
+  "src": "/assets/media/clientes/09_caixa.webp",
+  "w": 226,
+  "h": 53,
+  "publicar": true
+ },
+ {
+  "id": "10_banco_do_brasil",
+  "nome": "Banco do Brasil",
+  "src": "/assets/media/clientes/10_banco_do_brasil.webp",
+  "w": 210,
+  "h": 103,
+  "publicar": true
+ },
+ {
+  "id": "11_novotel",
+  "nome": "Novotel",
+  "src": "/assets/media/clientes/11_novotel.webp",
+  "w": 209,
+  "h": 120,
+  "publicar": true
+ },
+ {
+  "id": "12_cruzeiro_do_sul",
+  "nome": "Cruzeiro do Sul Educacional",
+  "src": "/assets/media/clientes/12_cruzeiro_do_sul.webp",
+  "w": 232,
+  "h": 71,
+  "publicar": true
+ },
+ {
+  "id": "13_syngenta",
+  "nome": "Syngenta",
+  "src": "/assets/media/clientes/13_syngenta.webp",
+  "w": 219,
+  "h": 71,
+  "publicar": true
+ },
+ {
+  "id": "14_arcom",
+  "nome": "Arcom Atacadista",
+  "src": "/assets/media/clientes/14_arcom.webp",
+  "w": 223,
+  "h": 74,
+  "publicar": true
+ },
+ {
+  "id": "15_samsung",
+  "nome": "Samsung",
+  "src": "/assets/media/clientes/15_samsung.webp",
+  "w": 218,
+  "h": 41,
+  "publicar": true
+ },
+ {
+  "id": "16_coca_cola",
+  "nome": "Coca-Cola",
+  "src": "/assets/media/clientes/16_coca_cola.webp",
+  "w": 211,
+  "h": 73,
+  "publicar": true
+ },
+ {
+  "id": "17_ambev",
+  "nome": "Ambev",
+  "src": "/assets/media/clientes/17_ambev.webp",
+  "w": 222,
+  "h": 59,
+  "publicar": true
+ },
+ {
+  "id": "18_nestle",
+  "nome": "Nestlé",
+  "src": "/assets/media/clientes/18_nestle.webp",
+  "w": 239,
+  "h": 80,
+  "publicar": true
+ },
+ {
+  "id": "19_natura",
+  "nome": "Natura",
+  "src": "/assets/media/clientes/19_natura.webp",
+  "w": 155,
+  "h": 98,
+  "publicar": true
+ },
+ {
+  "id": "20_anvisa",
+  "nome": "Anvisa",
+  "src": "/assets/media/clientes/20_anvisa.webp",
+  "w": 242,
+  "h": 71,
+  "publicar": true
+ },
+ {
+  "id": "21_mitsubishi",
+  "nome": "Mitsubishi Motors",
+  "src": "/assets/media/clientes/21_mitsubishi.webp",
+  "w": 105,
+  "h": 108,
+  "publicar": true
+ },
+ {
+  "id": "22_john_deere",
+  "nome": "John Deere",
+  "src": "/assets/media/clientes/22_john_deere.webp",
+  "w": 163,
+  "h": 100,
+  "publicar": true
+ },
+ {
+  "id": "23_vale",
+  "nome": "Vale",
+  "src": "/assets/media/clientes/23_vale.webp",
+  "w": 193,
+  "h": 78,
+  "publicar": true
+ },
+ {
+  "id": "24_petrobras",
+  "nome": "Petrobras",
+  "src": "/assets/media/clientes/24_petrobras.webp",
+  "w": 236,
+  "h": 60,
+  "publicar": true
+ },
+ {
+  "id": "25_minas_gerais",
+  "nome": "Governo de Minas Gerais",
+  "src": "/assets/media/clientes/25_minas_gerais.webp",
+  "w": 196,
+  "h": 91,
+  "publicar": true
+ },
+ {
+  "id": "26_uberlandia",
+  "nome": "Prefeitura de Uberlândia",
+  "src": "/assets/media/clientes/26_uberlandia.webp",
+  "w": 168,
+  "h": 83,
+  "publicar": false
+ },
+ {
+  "id": "27_fiemg",
+  "nome": "FIEMG",
+  "src": "/assets/media/clientes/27_fiemg.webp",
+  "w": 216,
+  "h": 65,
+  "publicar": true
+ },
+ {
+  "id": "28_sebrae",
+  "nome": "Sebrae",
+  "src": "/assets/media/clientes/28_sebrae.webp",
+  "w": 165,
+  "h": 93,
+  "publicar": true
+ }
+]

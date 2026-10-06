@@ -1,0 +1,1096 @@
+{
+ "version": "2026-10-05",
+ "credit": "Divulgação · Banda Nova York",
+ "items": [
+  {
+   "id": "oriente-3339",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.34
+   },
+   "pos": "50% 34%",
+   "bg": "#41170d",
+   "alt": "Três artistas de vermelho cantam e dançam diante do cenário oriental em LED",
+   "moment": "oriente",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/oriente-3339-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/oriente-3339-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/oriente-3339-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/oriente-3339-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_oriente-3339.jpg",
+    "name": "BNY_Palco_oriente-3339.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 673775
+   }
+  },
+  {
+   "id": "feixes-3341",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.52
+   },
+   "pos": "50% 52%",
+   "bg": "#3f120a",
+   "alt": "Palco inteiro aceso em vermelho, com feixes de luz e todo o grupo em cena",
+   "moment": "feixes",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/feixes-3341-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/feixes-3341-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/feixes-3341-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/feixes-3341-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_feixes-3341.jpg",
+    "name": "BNY_Palco_feixes-3341.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 680477
+   }
+  },
+  {
+   "id": "palco-3336",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.56
+   },
+   "pos": "50% 56%",
+   "bg": "#47170c",
+   "alt": "Grupo inteiro em cena no palco vermelho, cenário oriental em LED ao fundo",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/palco-3336-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/palco-3336-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/palco-3336-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/palco-3336-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_palco-3336.jpg",
+    "name": "BNY_Palco_palco-3336.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 730852
+   }
+  },
+  {
+   "id": "palco-3331",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.52,
+    "y": 0.56
+   },
+   "pos": "52% 56%",
+   "bg": "#2f140c",
+   "alt": "Vista geral do palco com o cenário oriental e o grupo em coreografia",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/palco-3331-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/palco-3331-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/palco-3331-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/palco-3331-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_palco-3331.jpg",
+    "name": "BNY_Palco_palco-3331.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 678340
+   }
+  },
+  {
+   "id": "oriente-3342",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.52,
+    "y": 0.46
+   },
+   "pos": "52% 46%",
+   "bg": "#2a110e",
+   "alt": "Cantora de vermelho ao microfone com artista ao lado, feixes vermelhos ao fundo",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/oriente-3342-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/oriente-3342-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/oriente-3342-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/oriente-3342-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_oriente-3342.jpg",
+    "name": "BNY_Palco_oriente-3342.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 567753
+   }
+  },
+  {
+   "id": "oriente-3345",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.5,
+    "y": 0.42
+   },
+   "pos": "50% 42%",
+   "bg": "#3d383f",
+   "alt": "Grupo de vermelho e preto posa ao fim do número, diante do LED claro",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/oriente-3345-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/oriente-3345-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/oriente-3345-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/oriente-3345-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_oriente-3345.jpg",
+    "name": "BNY_Palco_oriente-3345.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 597057
+   }
+  },
+  {
+   "id": "guitarras-3350",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.45,
+    "y": 0.4
+   },
+   "pos": "45% 40%",
+   "bg": "#442319",
+   "alt": "Músicos com guitarra e baixo em cena, triângulos laranja no LED",
+   "moment": "guitarras",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/guitarras-3350-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/guitarras-3350-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/guitarras-3350-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/guitarras-3350-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_guitarras-3350.jpg",
+    "name": "BNY_Palco_guitarras-3350.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 606964
+   }
+  },
+  {
+   "id": "guitarras-3349",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.5,
+    "y": 0.36
+   },
+   "pos": "50% 36%",
+   "bg": "#46251b",
+   "alt": "Guitarrista e baixista lado a lado sob as barras de luz laranja",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/guitarras-3349-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/guitarras-3349-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/guitarras-3349-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/guitarras-3349-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_guitarras-3349.jpg",
+    "name": "BNY_Palco_guitarras-3349.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 691834
+   }
+  },
+  {
+   "id": "disco-3352",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.46,
+    "y": 0.36
+   },
+   "pos": "46% 36%",
+   "bg": "#313646",
+   "alt": "Cantor de preto diante do globo espelhado em LED, artistas de tutu dançam",
+   "moment": "disco",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/disco-3352-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/disco-3352-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/disco-3352-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/disco-3352-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_disco-3352.jpg",
+    "name": "BNY_Palco_disco-3352.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 838164
+   }
+  },
+  {
+   "id": "disco-3351",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.55
+   },
+   "pos": "50% 55%",
+   "bg": "#212e38",
+   "alt": "Palco azul com globo espelhado e o grupo inteiro em coreografia",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/disco-3351-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/disco-3351-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/disco-3351-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/disco-3351-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_disco-3351.jpg",
+    "name": "BNY_Palco_disco-3351.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 721020
+   }
+  },
+  {
+   "id": "anos70-3353",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.55
+   },
+   "pos": "50% 55%",
+   "bg": "#272627",
+   "alt": "Momento anos 70 com painel colorido e o grupo dançando",
+   "moment": "anos70",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/anos70-3353-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/anos70-3353-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/anos70-3353-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/anos70-3353-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_anos70-3353.jpg",
+    "name": "BNY_Palco_anos70-3353.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 674155
+   }
+  },
+  {
+   "id": "anos70-3356",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.55
+   },
+   "pos": "50% 55%",
+   "bg": "#291a1a",
+   "alt": "Grupo em pose no momento anos 70, feixes brancos cruzando o palco",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/anos70-3356-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/anos70-3356-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/anos70-3356-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/anos70-3356-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_anos70-3356.jpg",
+    "name": "BNY_Palco_anos70-3356.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 659838
+   }
+  },
+  {
+   "id": "pop-3359",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.52,
+    "y": 0.46
+   },
+   "pos": "52% 46%",
+   "bg": "#312a2c",
+   "alt": "Artistas de branco e jeans no palco azul; convidada canta junto na frente",
+   "moment": "pop",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/pop-3359-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/pop-3359-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/pop-3359-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/pop-3359-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_pop-3359.jpg",
+    "name": "BNY_Publico_pop-3359.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 552605
+   }
+  },
+  {
+   "id": "pop-3360",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.5,
+    "y": 0.42
+   },
+   "pos": "50% 42%",
+   "bg": "#312828",
+   "alt": "Cantor de regata branca solta a voz no centro do palco",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/pop-3360-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/pop-3360-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/pop-3360-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/pop-3360-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_pop-3360.jpg",
+    "name": "BNY_Palco_pop-3360.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 419642
+   }
+  },
+  {
+   "id": "pop-3361",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.46,
+    "y": 0.44
+   },
+   "pos": "46% 44%",
+   "bg": "#401c1d",
+   "alt": "Cantora de vestido brilhante diante do LED roxo",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/pop-3361-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/pop-3361-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/pop-3361-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/pop-3361-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_pop-3361.jpg",
+    "name": "BNY_Palco_pop-3361.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 401606
+   }
+  },
+  {
+   "id": "bateria-3357",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.45,
+    "y": 0.48
+   },
+   "pos": "45% 48%",
+   "bg": "#333531",
+   "alt": "Baterista em primeiro plano com o palco enfumaçado ao fundo",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/bateria-3357-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/bateria-3357-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/bateria-3357-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/bateria-3357-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_bateria-3357.jpg",
+    "name": "BNY_Palco_bateria-3357.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 597225
+   }
+  },
+  {
+   "id": "country-3365",
+   "cat": "palco",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.52,
+    "y": 0.5
+   },
+   "pos": "52% 50%",
+   "bg": "#1c1512",
+   "alt": "Dupla em dueto no momento country, estrela no LED",
+   "moment": "country",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/country-3365-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/country-3365-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/country-3365-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/country-3365-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_country-3365.jpg",
+    "name": "BNY_Palco_country-3365.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 419121
+   }
+  },
+  {
+   "id": "country-3364",
+   "cat": "palco",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.46,
+    "y": 0.52
+   },
+   "pos": "46% 52%",
+   "bg": "#302723",
+   "alt": "Cantora de franjas sob o letreiro iluminado do momento country",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/country-3364-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/country-3364-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/country-3364-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/country-3364-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Palco_country-3364.jpg",
+    "name": "BNY_Palco_country-3364.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 544683
+   }
+  },
+  {
+   "id": "boteco-3375",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "pos": "50% 50%",
+   "bg": "#372937",
+   "alt": "Cenário Boteco Nova York com convidados à mesa cantando junto",
+   "moment": "boteco",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/boteco-3375-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/boteco-3375-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/boteco-3375-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/boteco-3375-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_boteco-3375.jpg",
+    "name": "BNY_Publico_boteco-3375.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 755847
+   }
+  },
+  {
+   "id": "boteco-3367",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "pos": "50% 50%",
+   "bg": "#292120",
+   "alt": "Mesa do Boteco Nova York no palco, artistas e convidados celebram",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/boteco-3367-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/boteco-3367-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/boteco-3367-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/boteco-3367-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_boteco-3367.jpg",
+    "name": "BNY_Publico_boteco-3367.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 693394
+   }
+  },
+  {
+   "id": "boteco-3383",
+   "cat": "publico",
+   "orient": "v",
+   "w": 2133,
+   "h": 3200,
+   "focus": {
+    "x": 0.5,
+    "y": 0.42
+   },
+   "pos": "50% 42%",
+   "bg": "#3d2e2c",
+   "alt": "Convidado de camisa branca abre os braços no Boteco Nova York",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 427,
+     "h": 640,
+     "src": "/assets/media/img/boteco-3383-640.webp"
+    },
+    {
+     "w": 683,
+     "h": 1024,
+     "src": "/assets/media/img/boteco-3383-1024.webp"
+    },
+    {
+     "w": 1066,
+     "h": 1600,
+     "src": "/assets/media/img/boteco-3383-1600.webp"
+    },
+    {
+     "w": 1600,
+     "h": 2400,
+     "src": "/assets/media/img/boteco-3383-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_boteco-3383.jpg",
+    "name": "BNY_Publico_boteco-3383.jpg",
+    "w": 1706,
+    "h": 2560,
+    "bytes": 718723
+   }
+  },
+  {
+   "id": "pista-3358",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.58,
+    "y": 0.34
+   },
+   "pos": "58% 34%",
+   "bg": "#393027",
+   "alt": "Cantoras descem do palco e cantam no meio dos convidados",
+   "moment": "pista",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/pista-3358-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/pista-3358-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/pista-3358-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/pista-3358-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_pista-3358.jpg",
+    "name": "BNY_Publico_pista-3358.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 438442
+   }
+  },
+  {
+   "id": "pista-3382",
+   "cat": "publico",
+   "orient": "h",
+   "w": 3200,
+   "h": 2133,
+   "focus": {
+    "x": 0.5,
+    "y": 0.46
+   },
+   "pos": "50% 46%",
+   "bg": "#2f3234",
+   "alt": "Público em silhueta diante do palco iluminado de branco",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 427,
+     "src": "/assets/media/img/pista-3382-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 683,
+     "src": "/assets/media/img/pista-3382-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1067,
+     "src": "/assets/media/img/pista-3382-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1600,
+     "src": "/assets/media/img/pista-3382-2400.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Publico_pista-3382.jpg",
+    "name": "BNY_Publico_pista-3382.jpg",
+    "w": 2560,
+    "h": 1706,
+    "bytes": 354017
+   }
+  },
+  {
+   "id": "elenco-branco",
+   "cat": "estudio",
+   "orient": "h",
+   "w": 2172,
+   "h": 1629,
+   "focus": {
+    "x": 0.5,
+    "y": 0.34
+   },
+   "pos": "50% 34%",
+   "bg": "#6d6b6d",
+   "alt": "Artistas da Nova York de branco, todos juntos em estúdio",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 480,
+     "src": "/assets/media/img/elenco-branco-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 768,
+     "src": "/assets/media/img/elenco-branco-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1200,
+     "src": "/assets/media/img/elenco-branco-1600.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Estudio_elenco-branco.jpg",
+    "name": "BNY_Estudio_elenco-branco.jpg",
+    "w": 2172,
+    "h": 1629,
+    "bytes": 652251
+   }
+  },
+  {
+   "id": "elenco-branco-pb",
+   "cat": "estudio",
+   "orient": "h",
+   "w": 2172,
+   "h": 1629,
+   "focus": {
+    "x": 0.5,
+    "y": 0.34
+   },
+   "pos": "50% 34%",
+   "bg": "#686868",
+   "alt": "Artistas da Nova York de branco em estúdio, versão preto e branco",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 480,
+     "src": "/assets/media/img/elenco-branco-pb-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 768,
+     "src": "/assets/media/img/elenco-branco-pb-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 1200,
+     "src": "/assets/media/img/elenco-branco-pb-1600.webp"
+    }
+   ],
+   "dl": {
+    "src": "/assets/media/dl/BNY_Estudio_elenco-branco-pb.jpg",
+    "name": "BNY_Estudio_elenco-branco-pb.jpg",
+    "w": 2172,
+    "h": 1629,
+    "bytes": 657363
+   }
+  }
+ ]
+}

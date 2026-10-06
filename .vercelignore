@@ -1,0 +1,8 @@
+# fica fora do deploy: template, scripts de build, testes e notas internas
+src/
+scripts/
+tests/
+README.md
+.gitignore
+.DS_Store
+*.command
