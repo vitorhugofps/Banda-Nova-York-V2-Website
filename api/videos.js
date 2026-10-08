@@ -6,7 +6,9 @@
    Títulos curados e o vídeo em destaque vêm sempre de assets/data/videos.json.
    O formato de cada vídeo (vertical ou horizontal) é conferido no oEmbed do YouTube pelo endereço /shorts/:
    ele responde 113×200 para vídeos verticais e 200×113 para horizontais. O player usa isso para mudar o quadro.
-   Cache na borda: 30 min (s-maxage) + 1 dia servindo o anterior enquanto revalida. ?debug=1 mostra o diagnóstico, sem cache. */
+   Cache na borda: 30 min (s-maxage) + 1 dia servindo o anterior enquanto revalida.
+   Só aceita GET/HEAD em /api/videos sem parâmetros (qualquer parâmetro redireciona para a URL limpa, que é a que fica em cache).
+   Diagnóstico: /api/videos?debug=<DEBUG_TOKEN>, só quando a variável de ambiente DEBUG_TOKEN estiver definida na Vercel. */
 const fs = require('fs');
 const path = require('path');
 
@@ -14,6 +16,7 @@ const CHANNEL = process.env.YT_CHANNEL_ID || 'UCI7G43SicG2nEoRWxZ72fnA';
 const UPLOADS = 'UU' + CHANNEL.slice(2);
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36';
 const MAX = 15;
+const MAX_BYTES = 3e6;   // respostas maiores que isso são descartadas
 
 function decode(s) {
   return String(s || '')
@@ -127,7 +130,10 @@ async function get(url, accept, ms = 3000) {
     headers: { 'user-agent': UA, accept, 'accept-language': 'en-US,en;q=0.9', cookie: 'CONSENT=YES+cb; SOCS=CAI' },
   });
   if (!r.ok) throw new Error(String(r.status));
-  return r.text();
+  if (+(r.headers.get('content-length') || 0) > MAX_BYTES) throw new Error('grande demais');
+  const t = await r.text();
+  if (t.length > MAX_BYTES) throw new Error('grande demais');
+  return t;
 }
 
 // confere vertical × horizontal de cada vídeo (em paralelo; se falhar, mantém o que já se sabia)
@@ -142,8 +148,13 @@ async function checkFormat(items) {
 }
 
 module.exports = async function handler(req, res) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') { res.setHeader('Allow', 'GET, HEAD'); return res.status(405).end(); }
+  const q = new URL(req.url || '/', 'http://local').searchParams;
+  const token = process.env.DEBUG_TOKEN || '';
+  const debug = !!token && q.get('debug') === token;
+  // parâmetros extras não furam o cache da borda
+  if ([...q.keys()].length && !debug) { res.setHeader('Cache-Control', 'public, s-maxage=86400'); res.setHeader('Location', '/api/videos'); return res.status(308).end(); }
   const base = readStatic();
-  const debug = /[?&]debug=1/.test(req.url || '');
   const tried = [];
   const now = Date.now();
   const common = { v: 1, generatedAt: new Date(now).toISOString(), channel: base.channel, featured: base.featured, titles: base.titles || {} };
@@ -155,6 +166,8 @@ module.exports = async function handler(req, res) {
   };
   const send = (body, cache) => {
     res.setHeader('Cache-Control', debug ? 'no-store' : cache);
+    res.setHeader('X-Robots-Tag', 'noindex');
+    if (!debug) delete body.error;
     res.status(200).json(debug ? { ...body, tried } : body);
   };
 

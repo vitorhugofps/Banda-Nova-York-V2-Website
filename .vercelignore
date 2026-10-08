@@ -6,3 +6,14 @@ README.md
 .gitignore
 .DS_Store
 *.command
+shots/
+assets/media/clientes/26_uberlandia.webp
+assets/data/empresas.json
+assets/vendor/SplitText.min.js
+assets/brand/icon-512.png
+assets/brand/BNY_logo_assinatura_preto.svg
+assets/brand/BNY_logo_novayork_*.svg
+assets/brand/BNY_logo_pequeno_preto.svg
+assets/brand/BNY_logo_pequeno_vermelho.svg
+assets/brand/BNY_logo_principal_branco.svg
+assets/brand/BNY_logo_principal_vermelho.svg

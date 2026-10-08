@@ -1,6 +1,6 @@
 /* Origem da visita (UTM, gclid/fbclid, site de referência) para chegar até o WhatsApp.
-   Primeiro toque: localStorage (90 dias). Último toque: sessionStorage. */
-const FIRST = 'ny-first', LAST = 'ny-last', DAYS90 = 90 * 864e5;
+   Fica só na aba aberta (sessionStorage); nada é guardado por mais tempo. */
+const LAST = 'ny-last';
 const KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'gclid', 'fbclid'];
 
 export function registrarOrigem() {
@@ -12,9 +12,8 @@ export function registrarOrigem() {
     if (!Object.keys(o).length && sessionStorage.getItem(LAST)) return;
     o.t = Date.now();
     sessionStorage.setItem(LAST, JSON.stringify(o));
-    const f = JSON.parse(localStorage.getItem(FIRST) || 'null');
-    if (!f || Date.now() - f.t > DAYS90) localStorage.setItem(FIRST, JSON.stringify(o));
   } catch (e) { /* navegação privada */ }
+  try { localStorage.removeItem('ny-first'); } catch (e) { /* versões antigas guardavam o primeiro toque */ }
 }
 
 export function lerOrigem() {

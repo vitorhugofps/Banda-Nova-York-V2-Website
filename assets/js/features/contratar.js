@@ -3,8 +3,9 @@
    - Escolhas únicas avançam sozinhas; Enter continua; teclas 1–9 escolhem a opção; Voltar e o mapa à esquerda revisitam etapas.
    - Transição entre perguntas: a atual sai desfocando, a próxima entra pelo Corte 56° e as opções sobem em sequência.
    - Sem campos de formato, duração, pacote ou montagem do show (regra da marca). Sem prévia da mensagem. */
-import { $, $$, config, hojeSP, coarse, testMode, reduce } from '../core/env.js';
+import { $, $$, config, hojeSP, testMode, reduce } from '../core/env.js';
 import { lerOrigem } from '../core/origem.js';
+import { scrollToY } from '../core/scroll.js';
 
 const DRAFT = 'ny-form-draft-v2', DRAFT_MS = 7 * 864e5;
 const ORG = {
@@ -79,7 +80,15 @@ export function initContratar() {
   const dataIn = form.elements.data, semdata = form.elements.semdata, tel = form.elements.whatsapp, msg = form.elements.mensagem, count = $('[data-count]', form);
   const steps = STEPS.map((k) => $(`[data-step="${k}"]`, form));
   const mapItems = new Map($$('[data-map-step]').map((li) => [li.dataset.mapStep, li]));
-  let cur = 0, busy = false, interacted = false, codigo = protocolo(), lastUrl = '', lastMsg = '', autoT = null;
+  let cur = 0, busy = false, interacted = false, codigo = protocolo(), lastUrl = '', lastMsg = '', autoT = null, intent = false;
+  const nav = $('[data-nav]', form);
+  // no celular a barra Voltar/Continuar fica presa no pé da tela: o campo ou o erro precisa ficar acima dela
+  function reveal(el) {
+    if (!el) return;
+    const r = el.getBoundingClientRect(), navH = nav ? nav.getBoundingClientRect().height : 0, top = 76, bottom = window.innerHeight - navH - 16;
+    if (r.top >= top && r.bottom <= bottom) return;
+    scrollToY(Math.max(0, window.scrollY + r.top - Math.max(top, (bottom - r.height) / 2)), 0.6);
+  }
 
   form.classList.add('is-flow');
   nEl.textContent = String(STEPS.length).padStart(2, '0');
@@ -125,7 +134,8 @@ export function initContratar() {
     const was = !orgFld.hidden;
     orgFld.hidden = !o;
     if (o) { orgLbl.textContent = o.label; orgReq.hidden = !o.req; }
-    if (o && !was && anim) gsap.fromTo(orgFld, { height: 0, opacity: 0, y: 10 }, { height: 'auto', opacity: 1, y: 0, duration: 0.45, ease: 'power3.out', clearProps: 'height,transform,opacity' });
+    if (o && !was && anim) gsap.fromTo(orgFld, { height: 0, opacity: 0, y: 10 }, { height: 'auto', opacity: 1, y: 0, duration: 0.45, ease: 'power3.out', clearProps: 'height,transform,opacity', onComplete: () => { if (interacted) reveal(orgFld); } });
+    else if (o && !was && interacted) reveal(orgFld);
     return !!o;
   }
 
@@ -218,6 +228,7 @@ export function initContratar() {
       const first = Object.keys(e)[0];
       const f = $(`[data-field="${first}"]`, form);
       ($('input:not([type=radio]), select, textarea', f) || $('input', f))?.focus({ preventScroll: true });
+      reveal(f);
       return false;
     }
     if (cur < STEPS.length - 1) go(cur + 1);
@@ -236,9 +247,12 @@ export function initContratar() {
     if (shown.length) paint(k, Object.fromEntries(Object.entries(er).filter(([c]) => shown.includes(c))));
     saveDraft(); paintMap();
   });
+  form.addEventListener('pointerdown', (e) => { if (e.target.closest('.opt')) intent = true; });
+  form.addEventListener('keydown', (e) => { if (e.key === ' ' && e.target.matches('.opt input')) intent = true; }, true);
   form.addEventListener('change', (e) => {
     const t = e.target; if (t.type !== 'radio') return;
     interacted = true;
+    const quer = intent; intent = false;
     const opt = t.closest('.opt');
     $$(`input[name="${t.name}"]`, form).forEach((r) => r.closest('.opt')?.classList.remove('is-pick'));
     if (opt) { void opt.offsetWidth; opt.classList.add('is-pick'); }
@@ -248,7 +262,7 @@ export function initContratar() {
       const precisa = syncOrg();
       if (precisa) { setTimeout(() => form.elements.organizacao.focus({ preventScroll: true }), anim ? 260 : 0); return; }
     }
-    if (AUTO.has(k) || t.name === 'contratante') { clearTimeout(autoT); autoT = setTimeout(() => avancar(), anim ? 420 : 0); }
+    if (quer && (AUTO.has(k) || t.name === 'contratante')) { clearTimeout(autoT); autoT = setTimeout(() => avancar(), anim ? 420 : 0); }
   });
   next.addEventListener('click', () => { interacted = true; avancar(); });
   back.addEventListener('click', () => { interacted = true; go(cur - 1); });
@@ -266,7 +280,7 @@ export function initContratar() {
     // atalhos 1–9 nas perguntas de escolha
     if (!txt && /^[1-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
       const radios = $$('.opt input', steps[cur]); const r = radios[+e.key - 1];
-      if (r) { e.preventDefault(); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); r.focus({ preventScroll: true }); }
+      if (r) { e.preventDefault(); intent = true; r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); r.focus({ preventScroll: true }); }
     }
   });
 
@@ -280,7 +294,7 @@ export function initContratar() {
     if (!livre) return;
     if (/^[1-9]$/.test(e.key)) {
       const r = $$('.opt input', steps[cur])[+e.key - 1];
-      if (r) { e.preventDefault(); interacted = true; r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); r.focus({ preventScroll: true }); }
+      if (r) { e.preventDefault(); interacted = true; intent = true; r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); r.focus({ preventScroll: true }); }
     } else if (e.key === 'Enter') { e.preventDefault(); interacted = true; focusStep(steps[cur]); }
   });
 
@@ -296,9 +310,9 @@ export function initContratar() {
     const m = montarMensagem(v, lerOrigem().texto || '', codigo);
     const url = `https://wa.me/${wa}?text=${encodeURIComponent(m)}`;
     lastUrl = url; lastMsg = m;
-    // abre de forma síncrona (sem await) para o navegador não bloquear
-    if (coarse) window.location.href = url;
-    else window.open(url, '_blank', 'noopener');
+    // abre de forma síncrona (sem await) para o navegador não bloquear; a página fica aberta com o painel final
+    const w = window.open(url, '_blank');
+    if (w) { try { w.opener = null; } catch (x) { /* outro domínio */ } } else window.location.href = url;
     again.href = url;
     finish();
     codigo = protocolo();
@@ -343,7 +357,7 @@ export function initContratar() {
       else if (f[k] && typeof x === 'string') f[k].value = x;      // RadioNodeList marca a opção com esse valor
     });
   }
-  try { const d = JSON.parse(localStorage.getItem(DRAFT) || 'null'); if (d && Date.now() - d.t < DRAFT_MS) restore(d.v); } catch (x) { /* nada */ }
+  try { const d = JSON.parse(localStorage.getItem(DRAFT) || 'null'); if (d && Date.now() - d.t < DRAFT_MS) restore(d.v); else if (d) localStorage.removeItem(DRAFT); } catch (x) { /* nada */ }
   const q = new URLSearchParams(location.search);
   if (q.get('evento')) { const r = $$('input[name=evento]', form).find((i) => i.value.toLowerCase().includes(q.get('evento').toLowerCase())); if (r) r.checked = true; }
   if (q.get('contratante')) { const r = $$('input[name=contratante]', form).find((i) => i.value.toLowerCase() === q.get('contratante').toLowerCase()); if (r) r.checked = true; }

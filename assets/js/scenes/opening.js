@@ -5,7 +5,8 @@
      0–.04 repouso · .04–.50 travessia · .46–.62 feixe 56° · .58–.90 manifesto acende · .88–1 assinatura ganha largura.
    Sem botões de entrada: a pessoa só rola. O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
    toque ou tecla em qualquer lugar. Com mouse, o cursor vira "Ouvir" sobre o vídeo (e "Silenciar" com som ligado).
-   O som vai do começo até o fim do slide branco (A experiência). */
+   O som vai do começo até o fim do slide branco (A experiência). Depois disso, o controle flutuante "Ouvir"
+   (no canto, em todo o site) liga a trilha de novo quando a pessoa quiser; ela segue tocando até ser pausada. */
 import { $, $$, clamp, lerp, smooth, inOut, reduce, fine, saveData, lowMem, config, testMode } from '../core/env.js';
 import { audio } from '../core/audio.js';
 import { bus } from '../core/bus.js';
@@ -33,7 +34,7 @@ export function initOpening() {
     parts.forEach((w, i) => { const s = document.createElement('span'); s.className = 'w'; s.textContent = w; line.appendChild(s); if (i < parts.length - 1) line.appendChild(document.createTextNode(' ')); words.push(s); });
   });
 
-  const st = { p: 0, ign: 0, vw: 0, vh: 0, g: null, userPaused: false, claimed: false, visible: true, video: false };
+  const st = { p: 0, ign: 0, vw: 0, vh: 0, g: null, userPaused: false, claimed: false, visible: true, video: false, manual: false };
   const cur = { on: false, el: null, bars: [], x: 0, y: 0 };   // cursor "Ouvir"
 
   // ---------- fonte do vídeo ----------
@@ -135,8 +136,9 @@ export function initOpening() {
     // o som segue pelo slide branco e baixa quando ele termina
     if (xp) ScrollTrigger.create({
       trigger: xp, start: 'bottom bottom', end: 'bottom 30%',
-      onUpdate: (self) => audio.setExit(1 - smooth(0, 1, self.progress)),
-      onLeave: () => { audio.setExit(0); sync(); },
+      // com o controle flutuante ligado, a trilha segue pelo site inteiro
+      onUpdate: (self) => audio.setExit(st.manual ? 1 : 1 - smooth(0, 1, self.progress)),
+      onLeave: () => { audio.setExit(st.manual ? 1 : 0); sync(); },
       onEnterBack: () => sync(),
       onLeaveBack: () => { audio.setExit(1); sync(); },
     });
@@ -151,7 +153,6 @@ export function initOpening() {
     const b = audio.bands(); const target = b ? Math.min(1, b[0] * 1.4) : 0;
     st.bass = (st.bass || 0) + (target - (st.bass || 0)) * (target > (st.bass || 0) ? 0.5 : 0.12);
     video.style.transform = `scale(${((1 + 0.08 * (st.e || 0)) * (1 + 0.03 * st.bass)).toFixed(4)})`;
-    pauseBtn.style.setProperty('--b', st.bass.toFixed(3));
     if (cur.on && b) cur.bars.forEach((el, i) => el.style.setProperty('--e', (0.35 + 0.65 * Math.min(1, b[i] * 1.5)).toFixed(3)));
   });
 
@@ -174,7 +175,7 @@ export function initOpening() {
   // zona do som: da abertura até o fim do slide branco
   const zoneEnd = () => (xp ? xp.offsetTop + xp.offsetHeight - window.innerHeight * 0.3 : sec.offsetTop + sec.offsetHeight);
   const inZone = () => window.scrollY < zoneEnd();
-  function wantPlay() { return useVideo && (st.visible || (audio.on && inZone())) && !st.userPaused && !st.claimed && !document.hidden; }
+  function wantPlay() { return useVideo && (st.visible || (audio.on && (inZone() || st.manual))) && !st.userPaused && !st.claimed && !document.hidden; }
   function sync() {
     if (!st.video) return;
     if (wantPlay()) { const pr = video.play(); if (pr && pr.catch) pr.catch(() => {}); } else video.pause();
@@ -201,7 +202,7 @@ export function initOpening() {
   });
   bus.on('media:claim', (who) => {
     if (who === 'opening') { st.claimed = false; sync(); return; }
-    st.claimed = true;
+    st.claimed = true; st.manual = false;
     if (audio.on) audio.disable();
     sync();
   });
@@ -216,13 +217,16 @@ export function initOpening() {
       const c = new C(); const ok = c.state === 'running'; c.close?.(); return ok;
     } catch (e) { return false; }
   }
-  const GESTOS = ['pointerdown', 'keydown', 'touchend'];
+  // só clique e toque contam (a tecla Tab não pode ligar o som; pelo teclado, o controle "Ouvir" é o primeiro da página)
+  const GESTOS = ['pointerdown', 'touchend'];
   const listen = () => GESTOS.forEach((ev) => window.addEventListener(ev, unlock, { capture: true, passive: true }));
   audio.onFail = () => { if (inZone()) listen(); };
   function unlock(e) {
     if (e && e.type === 'keydown' && (e.key === 'Escape' || e.metaKey || e.ctrlKey)) return;
     // com o cursor "Ouvir" na tela, quem decide é o clique no vídeo (evita ligar e desligar no mesmo clique)
     if (e && e.type === 'pointerdown' && cur.on) return;
+    // o controle flutuante de som decide sozinho (evita ligar e desligar no mesmo clique)
+    if (e && e.target && e.target.closest && e.target.closest('[data-som]')) return;
     // rolar com o dedo não conta como gesto: espera um toque de verdade
     if (navigator.userActivation && !navigator.userActivation.isActive) return;
     GESTOS.forEach((ev) => window.removeEventListener(ev, unlock, true));
@@ -241,7 +245,7 @@ export function initOpening() {
   if (fine && useVideo && !reduce) {
     const el = document.createElement('div');
     el.className = 'ouvir'; el.setAttribute('aria-hidden', 'true');
-    el.innerHTML = '<div class="ouvir__in"><span class="ouvir__eq"><i></i><i></i><i></i></span><span class="ouvir__t">Ouvir</span></div>';
+    el.innerHTML = '<span class="ouvir__dot"></span><div class="ouvir__in"><span class="ouvir__eq"><i></i><i></i><i></i></span><span class="ouvir__t">Ouvir</span></div>';
     document.body.appendChild(el);
     cur.el = el; cur.bars = $$('i', el); const tEl = $('.ouvir__t', el);
     const qx = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3.out' }), qy = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3.out' });
@@ -266,13 +270,11 @@ export function initOpening() {
     }, { passive: true });
     window.addEventListener('scroll', () => { if (cur.x || cur.y) check(); }, { passive: true });
     document.documentElement.addEventListener('mouseleave', () => show(false));
-    // o cursor fica centrado no ponteiro
-    gsap.set(el, { xPercent: -50, yPercent: -50 });
     stage.addEventListener('pointerdown', () => { if (cur.on) el.classList.add('is-press'); });
     window.addEventListener('pointerup', () => el.classList.remove('is-press'));
     stage.addEventListener('click', (e) => {
       if (!cur.on || e.target.closest('a, button')) return;
-      if (audio.on) audio.disable();
+      if (audio.on) { audio.disable(); st.manual = false; }
       else { st.claimed = false; loadVideo(); audio.enable({ play: !st.userPaused }); }
       sync(); label();
     });
@@ -283,6 +285,77 @@ export function initOpening() {
       idle += 0.06;
       cur.bars.forEach((b, i) => b.style.setProperty('--e', (0.45 + 0.35 * Math.sin(idle + i * 0.9)).toFixed(3)));
     });
+  }
+
+  // ---------- controle de som flutuante (site inteiro) ----------
+  // "Ouvir" liga a trilha da abertura em qualquer ponto do site; "Pausar" desliga. Fica discreto no canto,
+  // sai do caminho no telão, no formulário (celular), no rodapé e com o menu aberto, e sobe acima da barra fixa.
+  const somBtn = $('[data-som]');
+  if (somBtn && useVideo && !reduce) {
+    somBtn.hidden = false;
+    const bars = $$('i', somBtn);
+    const audible = () => audio.on && st.video && !video.paused && (st.manual || audio._exit > 0.05);
+    let on = null, t = 0, pk = null;
+    const peek = (ms) => { somBtn.classList.add('is-peek'); clearTimeout(pk); pk = setTimeout(() => somBtn.classList.remove('is-peek'), ms); };
+    setTimeout(() => peek(4500), introSeen ? 600 : 3000);   // apresenta o controle uma vez
+    const paint = (v) => {
+      if (v === on) return;
+      if (on !== null) peek(1800);
+      on = v;
+      somBtn.classList.toggle('is-on', v); somBtn.classList.toggle('is-off', !v);
+      somBtn.setAttribute('aria-pressed', String(v));
+      somBtn.setAttribute('aria-label', v ? 'Pausar a trilha da Nova York' : 'Ouvir a trilha da Nova York');
+    };
+    somBtn.addEventListener('click', () => {
+      if (audible()) { audio.disable(); st.manual = false; }
+      else {
+        st.manual = true; st.claimed = false; st.userPaused = false;
+        loadVideo(); audio.setExit(1); audio.enable({ play: true });
+      }
+      sync(); paint(audible());
+    });
+    gsap.ticker.add(() => {
+      const v = audible(); paint(v);
+      const b = v ? audio.bands() : null;
+      t += 0.05;
+      bars.forEach((el, i) => el.style.setProperty('--e', (b ? 0.25 + 0.75 * Math.min(1, b[Math.min(i, 2)] * 1.6) : 0.3 + (v ? 0.4 : 0.12) * Math.sin(t + i * 1.1)).toFixed(3)));
+    });
+    // fora do caminho
+    // - some no telão, no formulário (abaixo de 1024 px), no pé do rodapé e com o menu aberto;
+    // - abaixo de 1024 px, depois da abertura ele só aparece encaixado na barra vermelha (nunca por cima do conteúdo);
+    // - no desktop, se houver um botão ou link logo embaixo, ele se recolhe para a borda (is-dodge).
+    const html = document.documentElement, menuEl = $('#menu');
+    const away = { wall: false, form: false, foot: false };
+    let rq = 0;
+    const upd = () => {
+      rq = 0;
+      const narrow = window.innerWidth < 1024;
+      const inOpening = window.scrollY < sec.offsetTop + sec.offsetHeight - window.innerHeight * 0.5;
+      const off = away.wall || away.form || away.foot || (menuEl && !menuEl.hidden) || (narrow && !inOpening && !html.classList.contains('has-cta'));
+      somBtn.classList.toggle('is-away', off);
+      html.classList.toggle('has-som', !off);
+      // desvio (desktop): algo clicável embaixo do controle?
+      let under = false;
+      if (!off && !narrow) {
+        const y = window.innerHeight - 29;
+        for (const x of [14, 34, 54]) {
+          const hit = document.elementsFromPoint(x, y).find((n) => !somBtn.contains(n));
+          if (hit && hit !== document.body && hit !== html && hit.closest('a, button, input, select, textarea, label, [role="slider"], [tabindex]:not([tabindex="-1"])')) { under = true; break; }
+        }
+      }
+      somBtn.classList.toggle('is-dodge', under);
+    };
+    const later = () => { if (!rq) rq = requestAnimationFrame(upd); };
+    const watch = (sel, key, opts, test = () => true) => { const n = $(sel); if (n && 'IntersectionObserver' in window) new IntersectionObserver((es) => { away[key] = es[0].isIntersecting && test(); later(); }, opts).observe(n); };
+    watch('.wall-pin', 'wall', { rootMargin: '-30% 0px -30% 0px' });
+    watch('[data-form]', 'form', { threshold: 0 }, () => window.innerWidth < 1024);
+    watch('.ft__base', 'foot', { threshold: 0 });
+    if (menuEl) new MutationObserver(later).observe(menuEl, { attributes: true, attributeFilter: ['hidden'] });
+    new MutationObserver(later).observe(html, { attributes: true, attributeFilter: ['class'] });
+    let sc = 0;
+    window.addEventListener('scroll', () => { if (++sc % 4 === 0) later(); clearTimeout(upd.t); upd.t = setTimeout(later, 140); }, { passive: true });
+    window.addEventListener('resize', later);
+    later();
   }
 
   // ---------- movimento reduzido: vídeo sob demanda ----------
@@ -347,7 +420,7 @@ export function initOpening() {
   // carrega o vídeo logo após a primeira pintura
   if (useVideo) requestAnimationFrame(() => loadVideo());
 
-  const api = { get progress() { return st.p; }, render, measure, video, trig, cursor: cur };
+  const api = { get progress() { return st.p; }, render, measure, video, trig, cursor: cur, get manual() { return st.manual; } };
   if (testMode) (window.__NY__ ||= {}).opening = api;
   return api;
 }

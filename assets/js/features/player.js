@@ -204,7 +204,7 @@ export function initPlayer() {
       S.player = new YT.Player(host, {
         host: 'https://www.youtube-nocookie.com',
         videoId: v.id, width: '100%', height: '100%',
-        playerVars: { controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, disablekb: 1, fs: 0, modestbranding: 1, cc_load_policy: 0, enablejsapi: 1, origin: location.origin, widget_referrer: location.href },
+        playerVars: { controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, disablekb: 1, fs: 0, modestbranding: 1, cc_load_policy: 0, enablejsapi: 1, origin: location.origin, widget_referrer: location.origin + location.pathname },
         events: {
           onReady: () => {
             S.ready = true;
@@ -305,6 +305,21 @@ export function initPlayer() {
 
   // ---------- eventos ----------
   cover.addEventListener('click', () => (S.state === 'playing' ? pause() : play()));
+  // clique em qualquer ponto do vídeo tocando pausa (o iframe não recebe cliques no modo clean)
+  const hit = $('[data-pl-hit]', root);
+  if (hit) {
+    let hv = null;
+    hit.addEventListener('click', () => {
+      if (S.state !== 'playing' && S.state !== 'buffering') return;
+      hit.classList.remove('is-flash'); void hit.offsetWidth; hit.classList.add('is-flash');
+      pause();
+    });
+    hit.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      hit.classList.add('is-hover'); clearTimeout(hv); hv = setTimeout(() => hit.classList.remove('is-hover'), 1400);
+    });
+    hit.addEventListener('pointerleave', () => { clearTimeout(hv); hit.classList.remove('is-hover'); });
+  }
   bPlay.addEventListener('click', () => (S.state === 'playing' || S.state === 'buffering' ? pause() : play()));
   $('[data-act="prev"]', root).addEventListener('click', () => go(S.idx - 1, S.state === 'playing'));
   $('[data-act="next"]', root).addEventListener('click', () => go(S.idx + 1, S.state === 'playing'));
@@ -341,12 +356,8 @@ export function initPlayer() {
   // uma mídia por vez
   bus.on('media:claim', (who) => { if (who !== 'yt' && S.state === 'playing') pause(); });
 
-  // carrega a API na intenção (mouse/teclado) ou quando metade do palco estiver visível
+  // o YouTube só carrega quando a pessoa mostra intenção (mouse sobre o player, foco ou toque), nunca só por rolar
   ['pointerenter', 'focusin', 'touchstart'].forEach((ev) => root.addEventListener(ev, () => arm(), { once: true, passive: true }));
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((es) => { if (es[0].isIntersecting) { io.disconnect(); arm(); } }, { threshold: 0.5 });
-    io.observe(screen);
-  }
 
   loadData();
   const api = { get state() { return S.state; }, get items() { return S.items; }, go, play, pause, get source() { return S.source; } };

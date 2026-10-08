@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Banda Nova York · Música, performance e energia em um grande show</title>
+<title>Banda Nova York · Música, performance e energia</title>
 <meta name="description" content="A Nova York não é apenas uma banda. É música, performance e energia em um grande show. Desde 1998, em todos os palcos. Base em Uberlândia (MG).">
 <meta name="theme-color" content="#0A0A0A">
 <meta name="color-scheme" content="dark light">
@@ -17,12 +17,13 @@
 <meta property="og:image" content="https://banda-nova-york.vercel.app/assets/media/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Banda Nova York no palco, com o logotipo da banda">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
-<link rel="stylesheet" href="/assets/css/site.css?v=1791433436">
+<link rel="stylesheet" href="/assets/css/site.css?v=288931e6c3">
 <script>
   (function (d) {
     var h = d.documentElement; h.className = h.className.replace('no-js', 'js');
@@ -37,6 +38,11 @@
 </head>
 <body>
 <a class="skip" href="#experiencia">Pular para o conteúdo</a>
+<button class="som is-off" type="button" aria-pressed="false" aria-label="Ouvir a trilha da Nova York" data-som hidden>
+  <span class="som__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <span class="som__t larga" aria-hidden="true"><span class="t-off">Ouvir</span><span class="t-on">Pausar</span></span>
+</button>
+
 
 <header class="hd is-hidden" data-hd>
   <a class="hd__logo" href="#abertura" aria-label="Banda Nova York, voltar ao início">
@@ -74,15 +80,14 @@
   <h1 id="op-title" class="sr-only">Banda Nova&nbsp;York: música, performance e energia em um grande show</h1>
   <div class="op__stage">
     <div class="op__media" aria-hidden="true">
-      <video class="op__video" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback
-        poster="/assets/media/video/abertura-poster-1280.webp"></video>
+      <video class="op__video" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback></video>
       <div class="op__tint"></div>
     </div>
     <picture class="op__poster" aria-hidden="true">
       <source media="(orientation: portrait) and (max-width: 767px)" srcset="/assets/media/video/abertura-poster-retrato.webp">
-      <img src="/assets/media/video/abertura-poster-1920.webp" alt="" width="1920" height="1080" decoding="async">
+      <img src="/assets/media/video/abertura-poster-1920.webp" alt="" width="1920" height="1080" decoding="async" loading="lazy">
     </picture>
-    <img class="op__logo-static" src="/assets/brand/BNY_logo_assinatura_branco.svg" alt="" width="2121" height="478">
+    <img class="op__logo-static" src="/assets/brand/BNY_logo_assinatura_branco.svg" alt="" width="2121" height="478" loading="lazy">
     <svg class="op__logo" aria-hidden="true" focusable="false">
       <defs>
         <clipPath id="cp-ny" clipPathUnits="userSpaceOnUse"><path class="cp-ny__p" d="M0 0Z"/></clipPath>
@@ -102,13 +107,7 @@
       <p class="op__assin larga" data-largura>Música&nbsp;· Performance&nbsp;· Energia</p>
     </div>
     <button class="btn btn--red op__watch" type="button" data-watch>Assistir à abertura <svg class="ico ico--play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg></button>
-    <button class="op__pause" type="button" aria-pressed="false" aria-label="Pausar o vídeo da abertura" data-op-pause>
-      <span class="op__pause-in">
-        <svg class="op__pause-bg" viewBox="0 0 156 48" preserveAspectRatio="none" aria-hidden="true"><polygon points="32.4,.75 155.25,.75 123.6,47.25 .75,47.25"/></svg>
-        <span class="op__pause-ico" aria-hidden="true"><i></i><i></i><svg class="i-play" viewBox="0 0 16 16"><path d="M3 1.5l11 6.5-11 6.5z"/></svg></span>
-        <span class="op__pause-t larga" aria-hidden="true"><span class="t-pause">Pausar</span><span class="t-play">Tocar</span></span>
-      </span>
-    </button>
+    <button class="op__pause" type="button" aria-pressed="false" aria-label="Pausar o vídeo da abertura" data-op-pause><span class="larga" aria-hidden="true"><span class="t-pause">Pausar o vídeo</span><span class="t-play">Tocar o vídeo</span></span></button>
   </div>
 </section>
 
@@ -230,7 +229,8 @@
       <a class="btn btn--white" href="#contratar">Quero a Nova&nbsp;York no meu evento <svg class="ico" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h17M12 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
     </div>
   </div>
-  <div class="su__marquee" aria-label="Em todos os palcos: confraternizações, réveillon, casamentos, formaturas, festas de cidade, aniversários e carnaval.">
+  <div class="su__marquee">
+    <p class="sr-only">Em todos os palcos: confraternizações, réveillon, casamentos, formaturas, festas de cidade, aniversários e carnaval.</p>
     <div class="su__track disp" aria-hidden="true"><span>Em todos os palcos</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Confraternizações</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Réveillon</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Casamentos</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Formaturas</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Festas de cidade</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Aniversários</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Carnaval</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Em todos os palcos</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Confraternizações</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Réveillon</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Casamentos</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Formaturas</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Festas de cidade</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Aniversários</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Carnaval</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
   </div>
 </section>
@@ -283,6 +283,7 @@
             </span>
             <span class="sr-only" data-pl-cover-label>Assistir ao vídeo</span>
           </button>
+          <button class="pl__hit" type="button" tabindex="-1" aria-label="Pausar o vídeo" data-pl-hit><span class="pl__bezel" aria-hidden="true"><i></i><i></i></span></button>
           <div class="pl__state" data-pl-state hidden>
             <p class="pl__state-t disp"></p>
             <div class="pl__state-a"></div>
@@ -401,7 +402,7 @@
     </div>
 
     <div class="ct__main">
-    <form class="flow" data-form novalidate action="https://api.whatsapp.com/send" method="get" target="_blank">
+    <form class="flow" data-form novalidate>
       <input type="hidden" name="phone" value="5534999938787">
       <div class="flow__top">
         <img class="flow__logo" src="/assets/brand/BNY_logo_pequeno_branco.svg" alt="" width="2121" height="365">
@@ -533,13 +534,13 @@
         </div>
       </div>
 
-      <noscript><p class="flow__noscript">Para enviar pelo formulário, ative o JavaScript. Ou fale direto pelo WhatsApp: <a href="https://wa.me/5534999938787">(34) 99993-8787</a>.</p></noscript>
+      <p class="flow__fallback">Fale direto com a produção pelo WhatsApp: <a href="https://wa.me/5534999938787" target="_blank" rel="noopener">(34) 99993-8787</a>.</p>
 
       <div class="flow__nav" data-nav>
         <button class="flow__back larga" type="button" data-back>Voltar</button>
         <span class="flow__hint larga" aria-hidden="true" data-hint>Enter ↵ para continuar</span>
         <button class="btn btn--red flow__next" type="button" data-next>Continuar <svg class="ico" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h17M12 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
-        <button class="btn btn--red flow__send" type="submit" data-send>Continuar no WhatsApp <svg class="ico" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h17M12 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+        <button class="btn btn--red flow__send" type="submit" data-send><span class="t-l">Continuar no WhatsApp</span><span class="t-s">Enviar no WhatsApp</span> <svg class="ico" viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 6h17M12 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
       </div>
     </form>
       <dl class="ct__contacts">
@@ -569,7 +570,7 @@
       <div><p class="larga ft__k">A banda</p><p>Uberlândia · MG</p><p>Desde 1998</p><a href="#media-kit">Media kit</a></div>
     </div>
     <div class="ft__base">
-      <p>© <span data-year>2026</span> Banda Nova&nbsp;York</p>
+      <p>© <span data-year>2026</span> Banda Nova&nbsp;York · <a href="/privacidade">Privacidade</a></p>
       <p class="ft__viva disp" data-viva>Viva a experiência.</p>
     </div>
   </div>
@@ -599,6 +600,6 @@
 <script src="/assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/vendor/Flip.min.js" defer></script>
 <script src="/assets/vendor/lenis.min.js" defer></script>
-<script type="module" src="/assets/js/main.js?v=1791433436"></script>
+<script type="module" src="/assets/js/main.js?v=288931e6c3"></script>
 </body>
 </html>

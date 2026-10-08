@@ -1,6 +1,6 @@
 /* BANDA NOVA YORK · boot do site.
    Vocabulário de movimento: CORTE (56°), FEIXE (faixa vermelha a 56°), LARGURA (Archivo 62→125) e ACENDER (manifesto). */
-import { $, $$, reduce, testMode, RUN } from './core/env.js';
+import { $, $$, reduce, testMode, RUN, onIdle } from './core/env.js';
 import { initScroll, scroll } from './core/scroll.js';
 import { audio } from './core/audio.js';
 import { registrarOrigem } from './core/origem.js';
@@ -43,14 +43,26 @@ function boot() {
   };
   lazy('#videos', '100% 0px', () => import('./features/player.js').then((m) => m.initPlayer()));
   lazy('#media-kit', '150% 0px', () => import('./features/mediakit.js').then((m) => m.initMediaKit()));
-  lazy('#contratar', '150% 0px', () => import('./features/contratar.js').then((m) => m.initContratar()));
+  let ctOk = false; const ct = () => { if (ctOk) return; ctOk = true; import('./features/contratar.js').then((m) => m.initContratar()); };
+  lazy('#contratar', '150% 0px', ct);
+  window.addEventListener('load', () => onIdle(ct), { once: true });
   // deep links
   if (/^#foto=/.test(location.hash)) import('./features/mediakit.js').then((m) => m.initMediaKit());
   if (location.hash && location.hash.length > 1 && !/^#foto=/.test(location.hash)) {
-    const t = document.querySelector(location.hash);
+    let t = null; try { t = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { t = null; }
     if (t) setTimeout(() => import('./core/scroll.js').then((s) => s.goTo(t, { duration: 0.01, focus: false })), 300);
   }
   $$('[data-year]').forEach((e) => { e.textContent = new Date().getFullYear(); });
+  // faixa de momentos (celular): quando rola de lado, também rola pelo teclado
+  const ml = $('.mo__layers');
+  if (ml) {
+    const f = () => {
+      const s = ml.scrollWidth > ml.clientWidth + 4 && getComputedStyle(ml).overflowX !== 'visible';
+      if (s) { ml.tabIndex = 0; ml.setAttribute('role', 'region'); ml.setAttribute('aria-label', 'Momentos do show (role para o lado)'); }
+      else { ml.removeAttribute('tabindex'); ml.removeAttribute('role'); ml.removeAttribute('aria-label'); }
+    };
+    f(); window.addEventListener('resize', f);
+  }
   if (testMode) Object.assign((window.__NY__ ||= {}), { lenis: scroll.lenis, audio, opening, header, reduce });
 }
 

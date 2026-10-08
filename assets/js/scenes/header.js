@@ -56,10 +56,11 @@ export function initHeader() {
   const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.target.id === 'abertura') { if (e.isIntersecting) links.forEach((l) => { l.classList.remove('is-on'); l.removeAttribute('aria-current'); }); return; }
       const a = map.get(e.target.id); if (!a) return;
       if (e.isIntersecting) { links.forEach((l) => { l.classList.remove('is-on'); l.removeAttribute('aria-current'); }); a.classList.add('is-on'); a.setAttribute('aria-current', 'true'); }
     }), { rootMargin: '-45% 0px -50% 0px' });
-    ['experiencia', 'momentos', 'videos', 'media-kit', 'contratar'].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+    ['abertura', 'experiencia', 'momentos', 'videos', 'media-kit', 'contratar'].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
   }
 
   // ---------- menu (celular/tablet) ----------
@@ -94,6 +95,8 @@ export function initHeader() {
     const past = op ? window.scrollY > op.offsetHeight - window.innerHeight : true;
     const kb = vv ? vv.height < window.innerHeight * 0.75 : false;
     bar?.classList.toggle('is-on', past && !ctVisible && !ftVisible && !wpVisible && !kb && menu.hidden);
+    // o controle de som flutuante sobe quando a barra está na tela
+    document.documentElement.classList.toggle('has-cta', !!bar && bar.classList.contains('is-on') && bar.getClientRects().length > 0);
   }
   window.addEventListener('scroll', upd, { passive: true });
   vv?.addEventListener('resize', upd);

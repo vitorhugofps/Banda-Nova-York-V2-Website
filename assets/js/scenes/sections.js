@@ -233,7 +233,8 @@ export function initFooter() {
   const chars = [];
   if (viva) {
     const txt = viva.textContent.trim();
-    viva.setAttribute('aria-label', txt); viva.textContent = '';
+    viva.textContent = '';
+    const sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = txt; viva.appendChild(sr);
     txt.split(' ').forEach((w, wi, arr) => {
       const wd = document.createElement('span'); wd.className = 'wd'; wd.setAttribute('aria-hidden', 'true');
       [...w].forEach((c) => { const ch = document.createElement('span'); ch.className = 'ch'; ch.textContent = c; wd.appendChild(ch); chars.push(ch); });
