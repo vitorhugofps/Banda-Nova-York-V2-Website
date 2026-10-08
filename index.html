@@ -22,7 +22,7 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
-<link rel="stylesheet" href="/assets/css/site.css?v=1791260743">
+<link rel="stylesheet" href="/assets/css/site.css?v=1791433436">
 <script>
   (function (d) {
     var h = d.documentElement; h.className = h.className.replace('no-js', 'js');
@@ -103,7 +103,11 @@
     </div>
     <button class="btn btn--red op__watch" type="button" data-watch>Assistir à abertura <svg class="ico ico--play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg></button>
     <button class="op__pause" type="button" aria-pressed="false" aria-label="Pausar o vídeo da abertura" data-op-pause>
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-pause" d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/><path class="i-play" d="M4 2l10 6-10 6z"/></svg>
+      <span class="op__pause-in">
+        <svg class="op__pause-bg" viewBox="0 0 156 48" preserveAspectRatio="none" aria-hidden="true"><polygon points="32.4,.75 155.25,.75 123.6,47.25 .75,47.25"/></svg>
+        <span class="op__pause-ico" aria-hidden="true"><i></i><i></i><svg class="i-play" viewBox="0 0 16 16"><path d="M3 1.5l11 6.5-11 6.5z"/></svg></span>
+        <span class="op__pause-t larga" aria-hidden="true"><span class="t-pause">Pausar</span><span class="t-play">Tocar</span></span>
+      </span>
     </button>
   </div>
 </section>
@@ -253,6 +257,7 @@
 
 <!-- VÍDEOS ============================================================== -->
 <section id="videos" class="vd" aria-labelledby="vd-title">
+  <div class="vd__lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="wrap">
     <div class="vd__head">
       <div>
@@ -269,7 +274,8 @@
           <div class="pl__frame"><div class="pl__mount" id="pl-mount"></div></div>
           <button class="pl__cover" type="button" data-pl-cover>
             <img class="pl__thumb" alt="" decoding="async">
-            <span class="pl__big" aria-hidden="true"><svg class="ico ico--play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg></span>
+            <span class="pl__beam" aria-hidden="true"></span>
+            <span class="pl__big" aria-hidden="true"><svg class="pl__mk" viewBox="0 0 168 88" aria-hidden="true" focusable="false"><path class="pl__mk-b pl__mk-b1" d="M15.3 66L26.3 66L56.0 22L45.0 22Z"/><path class="pl__mk-b pl__mk-b2" d="M34.3 66L45.3 66L75.0 22L64.0 22Z"/><path class="pl__mk-b pl__mk-b3" d="M53.3 66L64.3 66L94.0 22L83.0 22Z"/><path class="pl__mk-t" d="M100 14L154 44L100 74Z"/></svg><span class="pl__big-t larga">Assistir</span></span>
             <span class="pl__meta">
               <span class="pl__badge" hidden>Novo</span>
               <span class="pl__title disp">Assista à Nova&nbsp;York</span>
@@ -593,6 +599,6 @@
 <script src="/assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/vendor/Flip.min.js" defer></script>
 <script src="/assets/vendor/lenis.min.js" defer></script>
-<script type="module" src="/assets/js/main.js?v=1791260743"></script>
+<script type="module" src="/assets/js/main.js?v=1791433436"></script>
 </body>
 </html>

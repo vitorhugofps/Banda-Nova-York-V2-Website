@@ -1,5 +1,5 @@
 /* Cenas das seções: CORTE (revelação 56°), LARGURA (assinatura 62→125), Experiência, Momentos, Figurinos, O show é único, Empresas e Rodapé. */
-import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, saveData, cortePolygon, corteEdge, once, RUN, mq } from '../core/env.js';
+import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, fine, saveData, cortePolygon, corteEdge, once, RUN, mq, testMode } from '../core/env.js';
 import { scroll } from '../core/scroll.js';
 import { bus } from '../core/bus.js';
 
@@ -281,11 +281,77 @@ export function initFooter() {
   ScrollTrigger.create({ trigger: ft, start: 'top bottom', end: 'top 30%', onUpdate: (s) => { logo.style.transform = `translateY(${((1 - inOut(s.progress)) * 60).toFixed(1)}px)`; } });
 }
 
-/* ---------- VÍDEOS: o palco digital "levanta" em perspectiva ---------- */
+/* ---------- VÍDEOS: o palco digital ----------
+   - O player "levanta" em perspectiva ao entrar.
+   - Cinco feixes de luz presos no topo da seção miram o cursor (no toque, varrem sozinhos com a rolagem).
+     Quando um vídeo toca, eles dançam e ficam mais fortes.
+   - A capa do player inclina levemente com o mouse e o feixe largo da capa segue o ponteiro.
+   - O clique no play dispara os feixes através da tela. */
 export function initVideoStage() {
-  const pl = $('[data-player]'); if (!pl || reduce || !mq('(min-width: 1024px)')) return;
-  ScrollTrigger.create({
+  const sec = $('#videos'), pl = $('[data-player]'); if (!sec || !pl) return;
+  const desk = mq('(min-width: 1024px)');
+  if (!reduce && desk) ScrollTrigger.create({
     trigger: pl, start: 'top bottom', end: 'top 35%',
     onUpdate: (s) => pl.style.setProperty('--rx', `${(14 * (1 - inOut(s.progress))).toFixed(2)}deg`),
   });
+  if (reduce) return;
+
+  // ---- feixes de luz ----
+  const box = $('.vd__lights', sec), beams = box ? $$('i', box) : [];
+  const XS = [0.06, 0.28, 0.5, 0.72, 0.94];
+  const S = beams.map((_, k) => ({ a: (k - 2) * 8, i: 0.45 }));
+  let active = false, mx = null, my = 0, t = 0, energy = 0, playing = false;
+  const isPlaying = () => pl.classList.contains('is-live') && !pl.classList.contains('is-paused');
+  if ('IntersectionObserver' in window) new IntersectionObserver((es) => { active = es[0].isIntersecting; box?.style.setProperty('--lo', active ? 1 : 0); }, { threshold: 0 }).observe(sec);
+  if (fine) {
+    sec.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; const r = sec.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, { passive: true });
+    sec.addEventListener('pointerleave', () => { mx = null; });
+  }
+  new MutationObserver(() => { playing = isPlaying(); }).observe(pl, { attributes: true, attributeFilter: ['class'] });
+  if (beams.length) gsap.ticker.add((time, dt) => {
+    if (!active) return;
+    t += Math.min(dt, 50) / 1000;
+    energy += ((playing ? 1 : 0) - energy) * 0.03;
+    const W = sec.clientWidth;
+    const sp = clamp((window.scrollY - sec.offsetTop + window.innerHeight) / (sec.offsetHeight + window.innerHeight));
+    beams.forEach((b, k) => {
+      const s = S[k];
+      let target;
+      if (mx !== null) {
+        // aponta para o cursor (rotação no sentido horário a partir de "para baixo")
+        target = clamp(-Math.atan2(mx - W * XS[k], Math.max(120, my)) * 57.2958, -40, 40);
+        target += Math.sin(t * 0.9 + k) * 3;
+      } else {
+        target = Math.sin(t * 0.45 + k * 1.3) * 16 + (sp - 0.5) * (k - 2) * 26;
+      }
+      // vídeo tocando: os feixes dançam em pares opostos
+      target += Math.sin(t * 2.4 + k * 1.7) * 16 * energy * (k % 2 ? -1 : 1);
+      s.a += (target - s.a) * (mx !== null ? 0.09 : 0.05);
+      const flick = energy * (0.12 * Math.sin(t * 9 + k * 2.1) + 0.08 * Math.sin(t * 15.7 + k));
+      s.i = 0.42 + 0.38 * energy + flick + (mx !== null ? 0.12 : 0);
+      b.style.setProperty('--a', `${s.a.toFixed(2)}deg`);
+      b.style.setProperty('--i', clamp(s.i).toFixed(3));
+    });
+  });
+
+  // ---- capa: inclinação e feixe que segue o mouse ----
+  const screen = $('.pl__screen', pl), cover = $('[data-pl-cover]', pl);
+  if (screen && cover && fine && desk) {
+    screen.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const r = screen.getBoundingClientRect(), x = clamp((e.clientX - r.left) / r.width), y = clamp((e.clientY - r.top) / r.height);
+      cover.style.setProperty('--mx', x.toFixed(3));
+      if (isPlaying()) { pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg'); return; }
+      pl.style.setProperty('--ty', `${((x - 0.5) * 5).toFixed(2)}deg`);
+      pl.style.setProperty('--tx', `${((0.5 - y) * 3.5).toFixed(2)}deg`);
+    }, { passive: true });
+    screen.addEventListener('pointerleave', () => { pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg'); cover.style.setProperty('--mx', '.5'); });
+  }
+  if (cover) cover.addEventListener('click', () => {
+    if (isPlaying()) return;
+    cover.classList.remove('is-go'); void cover.offsetWidth; cover.classList.add('is-go');
+    pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg');
+    setTimeout(() => cover.classList.remove('is-go'), 1400);
+  });
+  if (testMode) (window.__NY__ ||= {}).lights = { get angles() { return S.map((s) => +s.a.toFixed(1)); }, get energy() { return energy; } };
 }

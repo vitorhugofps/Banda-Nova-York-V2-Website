@@ -3,9 +3,10 @@
    O vídeo aparece por clip-path circle com a borda escondida sob o anel branco. O logo só escala de forma uniforme (nunca gira).
    Fases por progresso p (0–1) da seção presa:
      0–.04 repouso · .04–.50 travessia · .46–.62 feixe 56° · .58–.90 manifesto acende · .88–1 assinatura ganha largura.
-   Sem botões: a pessoa só rola. O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
-   toque ou tecla em qualquer lugar. Ele vai do começo até o fim do slide branco (A experiência). */
-import { $, $$, clamp, lerp, smooth, inOut, reduce, saveData, lowMem, config, testMode } from '../core/env.js';
+   Sem botões de entrada: a pessoa só rola. O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
+   toque ou tecla em qualquer lugar. Com mouse, o cursor vira "Ouvir" sobre o vídeo (e "Silenciar" com som ligado).
+   O som vai do começo até o fim do slide branco (A experiência). */
+import { $, $$, clamp, lerp, smooth, inOut, reduce, fine, saveData, lowMem, config, testMode } from '../core/env.js';
 import { audio } from '../core/audio.js';
 import { bus } from '../core/bus.js';
 import { scrollToY, y as docY } from '../core/scroll.js';
@@ -33,6 +34,7 @@ export function initOpening() {
   });
 
   const st = { p: 0, ign: 0, vw: 0, vh: 0, g: null, userPaused: false, claimed: false, visible: true, video: false };
+  const cur = { on: false, el: null, bars: [], x: 0, y: 0 };   // cursor "Ouvir"
 
   // ---------- fonte do vídeo ----------
   const portrait = window.matchMedia('(orientation: portrait)').matches && window.innerWidth < 768;
@@ -149,6 +151,8 @@ export function initOpening() {
     const b = audio.bands(); const target = b ? Math.min(1, b[0] * 1.4) : 0;
     st.bass = (st.bass || 0) + (target - (st.bass || 0)) * (target > (st.bass || 0) ? 0.5 : 0.12);
     video.style.transform = `scale(${((1 + 0.08 * (st.e || 0)) * (1 + 0.03 * st.bass)).toFixed(4)})`;
+    pauseBtn.style.setProperty('--b', st.bass.toFixed(3));
+    if (cur.on && b) cur.bars.forEach((el, i) => el.style.setProperty('--e', (0.35 + 0.65 * Math.min(1, b[i] * 1.5)).toFixed(3)));
   });
 
   // ---------- snap: o logo nunca repousa cortado ----------
@@ -217,6 +221,8 @@ export function initOpening() {
   audio.onFail = () => { if (inZone()) listen(); };
   function unlock(e) {
     if (e && e.type === 'keydown' && (e.key === 'Escape' || e.metaKey || e.ctrlKey)) return;
+    // com o cursor "Ouvir" na tela, quem decide é o clique no vídeo (evita ligar e desligar no mesmo clique)
+    if (e && e.type === 'pointerdown' && cur.on) return;
     // rolar com o dedo não conta como gesto: espera um toque de verdade
     if (navigator.userActivation && !navigator.userActivation.isActive) return;
     GESTOS.forEach((ev) => window.removeEventListener(ev, unlock, true));
@@ -228,6 +234,55 @@ export function initOpening() {
     if (soundAllowed()) { loadVideo(); audio.enable({ play: true }); }
     else listen();
     window.addEventListener('scroll', () => { if (audio.on && !st.visible) sync(); }, { passive: true });
+  }
+
+  // ---------- cursor "Ouvir" (mouse) ----------
+  // Segue o mouse sobre o palco da abertura. Clique: liga o som; com som, o cursor vira "Silenciar" e o clique desliga.
+  if (fine && useVideo && !reduce) {
+    const el = document.createElement('div');
+    el.className = 'ouvir'; el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="ouvir__in"><span class="ouvir__eq"><i></i><i></i><i></i></span><span class="ouvir__t">Ouvir</span></div>';
+    document.body.appendChild(el);
+    cur.el = el; cur.bars = $$('i', el); const tEl = $('.ouvir__t', el);
+    const qx = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3.out' }), qy = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3.out' });
+    let idle = 0;
+    const label = () => { el.classList.toggle('is-sound', audio.on); tEl.textContent = audio.on ? 'Silenciar' : 'Ouvir'; };
+    const show = (v) => {
+      if (v === cur.on) return;
+      cur.on = v; el.classList.toggle('is-on', v); stage.classList.toggle('is-ouvir', v);
+      if (v) label();
+    };
+    // vale só sobre o vídeo, fora de links e botões, depois da montagem do logo
+    const check = () => {
+      if (!st.introDone || !st.visible) { show(false); return; }
+      const t = document.elementFromPoint(cur.x, cur.y);
+      show(!!t && stage.contains(t) && !t.closest('a, button, [data-hd]'));
+    };
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') { show(false); return; }
+      cur.x = e.clientX; cur.y = e.clientY;
+      if (!cur.on) gsap.set(el, { x: cur.x, y: cur.y }); else { qx(cur.x); qy(cur.y); }
+      check();
+    }, { passive: true });
+    window.addEventListener('scroll', () => { if (cur.x || cur.y) check(); }, { passive: true });
+    document.documentElement.addEventListener('mouseleave', () => show(false));
+    // o cursor fica centrado no ponteiro
+    gsap.set(el, { xPercent: -50, yPercent: -50 });
+    stage.addEventListener('pointerdown', () => { if (cur.on) el.classList.add('is-press'); });
+    window.addEventListener('pointerup', () => el.classList.remove('is-press'));
+    stage.addEventListener('click', (e) => {
+      if (!cur.on || e.target.closest('a, button')) return;
+      if (audio.on) audio.disable();
+      else { st.claimed = false; loadVideo(); audio.enable({ play: !st.userPaused }); }
+      sync(); label();
+    });
+    bus.on('sound', label); label();
+    // sem som: as barras do cursor ondulam devagar
+    gsap.ticker.add(() => {
+      if (!cur.on || audio.on) return;
+      idle += 0.06;
+      cur.bars.forEach((b, i) => b.style.setProperty('--e', (0.45 + 0.35 * Math.sin(idle + i * 0.9)).toFixed(3)));
+    });
   }
 
   // ---------- movimento reduzido: vídeo sob demanda ----------
@@ -292,7 +347,7 @@ export function initOpening() {
   // carrega o vídeo logo após a primeira pintura
   if (useVideo) requestAnimationFrame(() => loadVideo());
 
-  const api = { get progress() { return st.p; }, render, measure, video, trig };
+  const api = { get progress() { return st.p; }, render, measure, video, trig, cursor: cur };
   if (testMode) (window.__NY__ ||= {}).opening = api;
   return api;
 }
