@@ -532,20 +532,6 @@ html.has-cta { scroll-padding-bottom: 76px; }
    ====================================================================== */
 .vd { position: relative; padding: clamp(110px, 16vh, 180px) 0; background: var(--grafite-2); border-top: 1px solid var(--linha); overflow: hidden; overflow: clip; isolation: isolate; }
 .vd > .wrap { position: relative; z-index: 1; }
-/* feixes de luz presos no topo da seção: miram o cursor (ou varrem sozinhos no toque) e dançam quando um vídeo toca */
-.vd__lights { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: var(--lo, 0); transition: opacity .6s; }
-.vd__lights i {
-  position: absolute; top: -4%; left: var(--x); width: clamp(120px, 14vw, 240px); height: 125%; margin-left: calc(clamp(120px, 14vw, 240px) / -2);
-  transform-origin: 50% 0; transform: rotate(var(--a, 0deg));
-  background: linear-gradient(90deg, rgba(225,20,30,0), rgba(225,20,30,.26) 32%, rgba(255,64,64,.5) 50%, rgba(225,20,30,.26) 68%, rgba(225,20,30,0));
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.55) 40%, transparent 82%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.55) 40%, transparent 82%);
-  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); mix-blend-mode: screen; opacity: var(--i, .5);
-}
-.vd__lights i:nth-child(1) { --x: 6%; } .vd__lights i:nth-child(2) { --x: 28%; } .vd__lights i:nth-child(3) { --x: 50%; }
-.vd__lights i:nth-child(4) { --x: 72%; } .vd__lights i:nth-child(5) { --x: 94%; }
-.vd__lights::after { /* refletores no teto */
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(225,20,30,.6), transparent);
-}
 @property --tx { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @property --ty { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .pl { transform-origin: 50% 100%; transform: rotateX(calc(var(--rx, 0deg) + var(--tx))) rotateY(var(--ty)); transition: --tx .6s var(--e-out), --ty .6s var(--e-out); }
