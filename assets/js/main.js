@@ -33,6 +33,17 @@ function boot() {
   initReveals();
   document.fonts?.ready.then(() => window.ScrollTrigger.refresh());
   window.addEventListener('load', () => window.ScrollTrigger.refresh());
+  // a página muda de altura sem redimensionar a janela (grade aberta, filtros, formulário, player, imagens):
+  // as cenas recalculam onde começam e terminam (senão o rodapé e as âncoras ficam defasados)
+  if ('ResizeObserver' in window) {
+    let hAnt = document.body.offsetHeight, rt = 0;
+    new ResizeObserver(() => {
+      const h = document.body.offsetHeight;
+      if (Math.abs(h - hAnt) < 2) return;
+      hAnt = h; clearTimeout(rt);
+      rt = setTimeout(() => { if (!window.ScrollTrigger.isRefreshing) window.ScrollTrigger.refresh(); hAnt = document.body.offsetHeight; }, 200);
+    }).observe(document.body);
+  }
 
   // módulos sob demanda
   const lazy = (sel, margin, load) => {
@@ -42,12 +53,13 @@ function boot() {
     io.observe(el);
   };
   lazy('#videos', '100% 0px', () => import('./features/player.js').then((m) => m.initPlayer()));
-  lazy('#media-kit', '150% 0px', () => import('./features/mediakit.js').then((m) => m.initMediaKit()));
+  let mkP = null; const mk = () => (mkP ||= import('./features/mediakit.js').then((m) => m.initMediaKit()));   // uma vez só
+  lazy('#media-kit', '150% 0px', mk);
   let ctOk = false; const ct = () => { if (ctOk) return; ctOk = true; import('./features/contratar.js').then((m) => m.initContratar()); };
   lazy('#contratar', '150% 0px', ct);
   window.addEventListener('load', () => onIdle(ct), { once: true });
   // deep links
-  if (/^#foto=/.test(location.hash)) import('./features/mediakit.js').then((m) => m.initMediaKit());
+  if (/^#foto=/.test(location.hash)) mk();
   if (location.hash && location.hash.length > 1 && !/^#foto=/.test(location.hash)) {
     let t = null; try { t = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { t = null; }
     if (t) setTimeout(() => import('./core/scroll.js').then((s) => s.goTo(t, { duration: 0.01, focus: false })), 300);

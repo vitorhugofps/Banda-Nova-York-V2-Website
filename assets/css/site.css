@@ -280,7 +280,8 @@ html.has-cta { scroll-padding-bottom: 76px; }
 .som[hidden] { display: none; }
 .som.is-away { opacity: 0; pointer-events: none; visibility: hidden; translate: 0 12px; transition: opacity .35s, translate .45s var(--e-out), visibility 0s .35s; }
 /* desktop: se houver um botão ou link logo embaixo, o controle se recolhe para a borda (volta no hover) */
-.som.is-dodge:not(:hover):not(:focus-visible):not(.is-peek) { translate: -72% 0; opacity: .75; }
+.som.is-dodge:not(:hover):not(:focus-visible) { translate: -72% 0; opacity: .75; }
+.som.is-dodge:not(:hover):not(:focus-visible) .som__t { max-width: 0; margin-left: 0; opacity: 0; }
 /* celular/tablet: com a barra vermelha na tela, o controle entra na ponta esquerda dela */
 @media (max-width: 1023px) {
   .has-cta .som { z-index: 85; bottom: calc(14px + env(safe-area-inset-bottom)); left: 8px; animation: none; }
@@ -429,7 +430,6 @@ html.has-cta { scroll-padding-bottom: 76px; }
   .js:not(.reduce) .mo__layers { display: block; position: absolute; inset: 0; padding: 0; overflow: hidden; }
   .js:not(.reduce) .mo__layers .mo__layer { position: absolute; inset: 0; height: auto; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
   .js:not(.reduce) .mo__layers .mo__layer:first-child { clip-path: none; }
-  .js:not(.reduce) .mo__layer img { will-change: transform; }
   .js:not(.reduce) .mo__layer::after { content: ""; position: absolute; inset: 0; background: var(--preto); opacity: var(--dim, 0); }
   .js:not(.reduce) .mo__cap { display: none; }
   .js:not(.reduce) .mo__shade { display: block; position: absolute; inset: 0; pointer-events: none;
@@ -542,7 +542,6 @@ html.has-cta { scroll-padding-bottom: 76px; }
 .vd__stage { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 3.6fr); gap: 20px; perspective: 1600px; }
 /* o quadro acompanha o formato do vídeo: 16:9 (horizontal) ou 9:16 (vertical); o JS calcula e anima o tamanho */
 .pl__screen { position: relative; aspect-ratio: 16 / 9; width: 100%; background: #000; overflow: hidden; margin-inline: auto; }
-.js .pl__screen { aspect-ratio: auto; }
 .pl__bar, .pl__now { width: var(--pl-w, 100%); margin-inline: auto; max-width: 100%; }
 .pl.is-narrow .pl__bar { flex-wrap: wrap; height: auto; padding: 4px; }
 .pl.is-narrow .pl__time { order: 5; }
@@ -679,6 +678,12 @@ html.has-cta { scroll-padding-bottom: 76px; }
 .mk__meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--branco); font-size: 11px; }
 .mk__meta span + span { color: var(--cinza-claro); }
 .no-js .wall, .reduce .wall { display: none; }
+/* sem telão (sem JS ou movimento reduzido), o texto não fala dele */
+.mk__abra, .no-js .mk__gire, .reduce .mk__gire { display: none; }
+.no-js .mk__abra, .reduce .mk__abra { display: inline; }
+/* sem JS: some o que depende de script (menu, filtros, controles do player); a foto da grade abre a imagem grande */
+.no-js .hd__burger, .no-js .mk__filters, .no-js .mk__more, .no-js .pl__bar, .no-js .pl__big, .no-js .pl__hit { display: none !important; }
+.no-js .mk__grid .mk__cell.is-more { display: block; }
 
 .mk__filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
 .mk__filters button {
@@ -852,7 +857,7 @@ html.has-cta { scroll-padding-bottom: 76px; }
 .fld textarea { min-height: 120px; border: 1px solid #343434; padding: 14px 16px; font-size: 18px; resize: vertical; }
 .fld select { background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%); background-position: calc(100% - 14px) 28px, calc(100% - 9px) 28px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 30px; }
 .fld select option { color: var(--preto); }
-.fld input::placeholder, .fld textarea::placeholder { color: #575757; }
+.fld input::placeholder, .fld textarea::placeholder { color: #8A8A8A; }
 .fld input:hover, .fld select:hover, .fld textarea:hover { border-color: #5a5a5a; }
 .fld input:focus, .fld select:focus, .fld textarea:focus { border-color: var(--branco); outline: none; }
 .fld input[type="date"] { color-scheme: dark; }

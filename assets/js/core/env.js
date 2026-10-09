@@ -8,7 +8,8 @@ export const config = JSON.parse(document.getElementById('ny-config')?.textConte
 const conn = navigator.connection || {};
 export const saveData = !!conn.saveData || /(^|slow-)2g|3g/.test(conn.effectiveType || '');
 export const lowMem = (navigator.deviceMemory || 8) < 2;
-export const testMode = new URLSearchParams(location.search).has('test');
+// ganchos de teste só no computador de quem desenvolve (nunca no site publicado)
+export const testMode = new URLSearchParams(location.search).has('test') && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
 export const RUN = 0.6745;           // 1 / tan(56°)
 export const SKEW = -34;             // skewX que transforma vertical em 56°
@@ -27,6 +28,24 @@ export function cortePolygon(t, w, h) {
   const xb = t * (1 + kr) - kr;
   const xt = xb + kr;
   return { xb, xt, css: `polygon(0% 0%, ${(xt * 100).toFixed(3)}% 0%, ${(xb * 100).toFixed(3)}% 100%, 0% 100%)` };
+}
+/** Polígonos de entrada pelo CORTE 56° em % do próprio elemento (o ângulo fica certo em qualquer proporção). */
+export function corteVals(el) {
+  const w = el.offsetWidth || 1, h = el.offsetHeight || 0, k = (RUN * h * 100) / w;
+  return { from: `polygon(0 0, 0 0, ${(-k).toFixed(2)}% 100%, 0 100%)`, to: `polygon(0 0, ${(100 + k).toFixed(2)}% 0, 100% 100%, 0 100%)` };
+}
+/** Texto sem metades de emoji (um corte no meio de um par substituto quebra o encodeURIComponent). */
+export function bemFormado(s) {
+  s = String(s ?? '');
+  if (s.toWellFormed) return s.toWellFormed();
+  let o = '';
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c >= 0xd800 && c <= 0xdbff) { const d = s.charCodeAt(i + 1); if (d >= 0xdc00 && d <= 0xdfff) { o += s[i] + s[i + 1]; i++; } else o += '\ufffd'; }
+    else if (c >= 0xdc00 && c <= 0xdfff) o += '\ufffd';
+    else o += s[i];
+  }
+  return o;
 }
 /** Linha vermelha que acompanha a aresta do corte (px). */
 export function corteEdge(xb, xt, w, h, px = 3) {

@@ -3,7 +3,7 @@
    - Escolhas únicas avançam sozinhas; Enter continua; teclas 1–9 escolhem a opção; Voltar e o mapa à esquerda revisitam etapas.
    - Transição entre perguntas: a atual sai desfocando, a próxima entra pelo Corte 56° e as opções sobem em sequência.
    - Sem campos de formato, duração, pacote ou montagem do show (regra da marca). Sem prévia da mensagem. */
-import { $, $$, config, hojeSP, testMode, reduce } from '../core/env.js';
+import { $, $$, config, hojeSP, testMode, reduce, corteVals, bemFormado } from '../core/env.js';
 import { lerOrigem } from '../core/origem.js';
 import { scrollToY } from '../core/scroll.js';
 
@@ -20,6 +20,11 @@ const CAMPOS = { evento: ['evento'], contratante: ['contratante', 'organizacao']
 const AUTO = new Set(['evento', 'publico']);   // escolha única que avança sozinha (contratante avança se não pedir organização)
 
 export const limpa = (s) => String(s || '').replace(/[*_~`]/g, '').replace(/\s+/g, ' ').trim();
+// cidade: o iPhone troca ' por ’ sozinho (Santa Bárbara d’Oeste, Pingo-d’Água)
+export const cidade = (s) => limpa(String(s || '').replace(/[’ʼ´‘]/g, "'"));
+// texto livre: tira só os marcadores de formatação nas bordas das palavras (ana_paula@x.com continua inteiro)
+export const semMarca = (s) => String(s || '').replace(/(^|\s)[*_~`]+|[*_~`]+(?=\s|$)/g, '$1').trim();
+const sem = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 export function fmtData(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if (!m) return '';
   const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
@@ -54,17 +59,18 @@ export function montarMensagem(v, origem, codigo) {
   L.push(`*Contratante:* ${limpa(v.contratante) || '—'}${org ? ` — ${org}` : ''}`);
   L.push(`*Evento:* ${limpa(v.evento) || '—'}`);
   L.push(`*Data:* ${v.semdata ? 'ainda não definida' : fmtData(v.data) || '—'}`);
-  L.push(`*Cidade:* ${limpa(v.cidade) || '—'}${v.uf ? `/${v.uf}` : ''}`);
+  L.push(`*Cidade:* ${cidade(v.cidade) || '—'}${v.uf ? `/${v.uf}` : ''}`);
   if (limpa(v.local)) L.push(`*Local:* ${limpa(v.local)}`);
   if (v.publico) L.push(`*Público estimado:* ${v.publico}`);
   L.push('');
   L.push(`*Nome:* ${limpa(v.nome) || '—'}`);
   if (v.whatsapp) L.push(`*WhatsApp:* ${mascara(v.whatsapp)}`);
-  if (limpa(v.email)) L.push(`*E-mail:* ${limpa(v.email)}`);
-  const msg = String(v.mensagem || '').replace(/[*_~`]/g, '').trim();
+  const email = String(v.email || '').replace(/\s+/g, '');
+  if (email) L.push(`*E-mail:* ${email}`);
+  const msg = semMarca(v.mensagem);
   if (msg) L.push('', `*Mensagem:* ${msg}`);
-  L.push('', `Código: ${codigo}${origem ? ` · origem: ${origem}` : ''}`);
-  return L.join('\n');
+  L.push('', `Código: ${codigo}${limpa(origem) ? ` · origem: ${limpa(origem)}` : ''}`);
+  return bemFormado(L.join('\n'));
 }
 
 export function initContratar() {
@@ -112,7 +118,7 @@ export function initContratar() {
       else if (v.data < dataIn.min) e.data = 'A data precisa ser a partir de hoje.';
       else if (v.data > dataIn.max) e.data = 'Escolha uma data nos próximos três anos.';
     }
-    const cid = limpa(v.cidade);
+    const cid = cidade(v.cidade);
     if (cid.length < 2 || !/^[A-Za-zÀ-ÿ' .\-]{2,60}$/.test(cid)) e.cidade = 'Informe a cidade do evento.';
     if (!v.uf) e.uf = 'Escolha a UF.';
     if (limpa(v.nome).length < 2) e.nome = 'Informe seu nome.';
@@ -134,6 +140,7 @@ export function initContratar() {
     const was = !orgFld.hidden;
     orgFld.hidden = !o;
     if (o) { orgLbl.textContent = o.label; orgReq.hidden = !o.req; }
+    else form.elements.organizacao.value = '';   // sem nome de organização "fantasma" quando o campo some
     if (o && !was && anim) gsap.fromTo(orgFld, { height: 0, opacity: 0, y: 10 }, { height: 'auto', opacity: 1, y: 0, duration: 0.45, ease: 'power3.out', clearProps: 'height,transform,opacity', onComplete: () => { if (interacted) reveal(orgFld); } });
     else if (o && !was && interacted) reveal(orgFld);
     return !!o;
@@ -144,7 +151,7 @@ export function initContratar() {
     if (k === 'evento') return v.evento;
     if (k === 'contratante') return [v.contratante, limpa(v.organizacao)].filter(Boolean).join(' · ');
     if (k === 'data') return v.semdata ? 'A definir' : (v.data ? fmtData(v.data) : '');
-    if (k === 'cidade') return limpa(v.cidade) ? `${limpa(v.cidade)}/${v.uf}` : '';
+    if (k === 'cidade') return cidade(v.cidade) ? `${cidade(v.cidade)}${v.uf ? `/${v.uf}` : ''}` : '';
     if (k === 'publico') return v.publico || '';
     if (k === 'contato') return limpa(v.nome);
     return '';
@@ -188,7 +195,8 @@ export function initContratar() {
     const t = $('.st__t', st), n = $('.st__n', st);
     const items = $$('.opt, .fld:not([hidden]), .check, .st__hint, .st__note, .st__done-a', st);
     gsap.fromTo(n, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out', clearProps: 'all' });
-    gsap.fromTo(t, { clipPath: 'polygon(0 0, 0 0, -40% 100%, 0 100%)', y: 22 * dir }, { clipPath: 'polygon(0 0, 140% 0, 100% 100%, 0 100%)', y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'clipPath,transform' });
+    const c = corteVals(t);
+    gsap.fromTo(t, { clipPath: c.from, y: 22 * dir }, { clipPath: c.to, y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'clipPath,transform' });
     gsap.fromTo(items, { y: 18 * dir, opacity: 0, filter: 'blur(6px)' }, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out', stagger: 0.035, delay: 0.1, clearProps: 'filter,transform,opacity' });
   }
   function go(to, { focus = true } = {}) {
@@ -228,7 +236,9 @@ export function initContratar() {
       const first = Object.keys(e)[0];
       const f = $(`[data-field="${first}"]`, form);
       ($('input:not([type=radio]), select, textarea', f) || $('input', f))?.focus({ preventScroll: true });
-      reveal(f);
+      // grupo de opções mais alto que meia tela (celular): mostra a mensagem de erro, não o topo do grupo
+      const err = $(`#err-${first}`, form);
+      reveal(f && err && f.getBoundingClientRect().height > window.innerHeight * 0.5 ? err : f);
       return false;
     }
     if (cur < STEPS.length - 1) go(cur + 1);
@@ -298,8 +308,10 @@ export function initContratar() {
     } else if (e.key === 'Enter') { e.preventDefault(); interacted = true; focusStep(steps[cur]); }
   });
 
+  let enviando = false;
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (enviando || form.classList.contains('is-sent')) return;   // duplo clique não abre duas conversas
     const v = val(), er = erros(v);
     const bad = STEPS.findIndex((k) => Object.keys(errosDa(k, er)).length);
     if (bad >= 0) {
@@ -307,6 +319,7 @@ export function initContratar() {
       else { go(bad); setTimeout(() => paint(STEPS[bad], errosDa(STEPS[bad], er)), anim ? 320 : 0); }
       return;
     }
+    enviando = true;
     const m = montarMensagem(v, lerOrigem().texto || '', codigo);
     const url = `https://wa.me/${wa}?text=${encodeURIComponent(m)}`;
     lastUrl = url; lastMsg = m;
@@ -336,7 +349,7 @@ export function initContratar() {
     const keep = { nome: form.elements.nome.value, whatsapp: form.elements.whatsapp.value, email: form.elements.email.value };
     form.reset(); restore(keep); dataIn.disabled = false; syncOrg();
     $$('.opt', form).forEach((o) => o.classList.remove('is-pick'));
-    done.hidden = true; form.classList.remove('is-sent');
+    done.hidden = true; form.classList.remove('is-sent'); enviando = false;
     steps.forEach((s) => s.classList.remove('is-on'));
     cur = 0; furthest = 0; steps[0].classList.add('is-on'); chrome(); count.textContent = '0';
     if (anim) enter(steps[0], 1);
@@ -359,8 +372,14 @@ export function initContratar() {
   }
   try { const d = JSON.parse(localStorage.getItem(DRAFT) || 'null'); if (d && Date.now() - d.t < DRAFT_MS) restore(d.v); else if (d) localStorage.removeItem(DRAFT); } catch (x) { /* nada */ }
   const q = new URLSearchParams(location.search);
-  if (q.get('evento')) { const r = $$('input[name=evento]', form).find((i) => i.value.toLowerCase().includes(q.get('evento').toLowerCase())); if (r) r.checked = true; }
-  if (q.get('contratante')) { const r = $$('input[name=contratante]', form).find((i) => i.value.toLowerCase() === q.get('contratante').toLowerCase()); if (r) r.checked = true; }
+  // sem diferença de acento ou caixa; igual primeiro, depois o começo (pelo menos 3 letras)
+  const acha = (name, txt, prefixo) => {
+    const t = sem(txt); if (t.length < 3) return null;
+    const ops = $$(`input[name=${name}]`, form);
+    return ops.find((i) => sem(i.value) === t) || (prefixo ? ops.find((i) => sem(i.value).startsWith(t)) : null);
+  };
+  const qe = q.get('evento') && acha('evento', q.get('evento'), true); if (qe) qe.checked = true;
+  const qc = q.get('contratante') && acha('contratante', q.get('contratante'), false); if (qc) qc.checked = true;
   syncOrg(); count.textContent = msg.value.length;
   // começa na primeira pergunta ainda sem resposta
   const er0 = erros(val());

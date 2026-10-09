@@ -1,5 +1,5 @@
 /* Cenas das seções: CORTE (revelação 56°), LARGURA (assinatura 62→125), Experiência, Momentos, Figurinos, O show é único, Empresas e Rodapé. */
-import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, fine, saveData, cortePolygon, corteEdge, once, RUN, mq, testMode } from '../core/env.js';
+import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, fine, saveData, cortePolygon, corteEdge, corteVals, once, RUN, testMode } from '../core/env.js';
 import { scroll } from '../core/scroll.js';
 import { bus } from '../core/bus.js';
 
@@ -17,7 +17,10 @@ export function initReveals() {
       el.style.setProperty('--wdth', 62); el.style.setProperty('--ls', '0em');
       ScrollTrigger.create({
         trigger: el, start: 'top 92%', end: 'top 45%',
-        onUpdate: (s) => { const t = inOut(s.progress); el.style.setProperty('--wdth', (62 + 63 * t).toFixed(1)); el.style.setProperty('--ls', `${(0.22 * t).toFixed(3)}em`); },
+        onUpdate: (s) => {
+          if (getComputedStyle(el).whiteSpace !== 'nowrap') { el.style.removeProperty('--wdth'); el.style.removeProperty('--ls'); return; }
+          const t = inOut(s.progress); el.style.setProperty('--wdth', (62 + 63 * t).toFixed(1)); el.style.setProperty('--ls', `${(0.22 * t).toFixed(3)}em`);
+        },
       });
     });
   }
@@ -35,14 +38,14 @@ export function initReveals() {
 /* ---------- ASSINATURA: cada palavra abre a largura (62 → 100) e mostra mais do palco ---------- */
 export function initAssinatura() {
   const rows = $$('[data-row]'); if (!rows.length || reduce) return;
-  const wide = mq('(min-width: 1024px)');
+  const largo = window.matchMedia('(min-width: 1024px)');
   rows.forEach((row) => {
     const mask = $('.as__mask', row), src = $('.as__src', row), bar = $('.as__bar', row);
     ScrollTrigger.create({
       trigger: row, start: 'top 92%', end: 'top 38%',
       onUpdate: (s) => {
         const t = inOut(s.progress);
-        if (wide) mask.style.setProperty('--wdth', (62 + 38 * t).toFixed(1));
+        if (largo.matches) mask.style.setProperty('--wdth', (62 + 38 * t).toFixed(1)); else mask.style.removeProperty('--wdth');
         bar.style.setProperty('--bar', (0.15 + 0.85 * t).toFixed(3));
       },
     });
@@ -54,7 +57,8 @@ export function initAssinatura() {
 export function initExperiencia() {
   const media = $('.xp__media'), frame = $('.xp__frame'), cor = $('.xp__cor'), edge = $('.xp__edge'), todos = $('.xp__todos');
   if (!media || reduce) { todos?.classList.add('is-in'); return; }
-  const desk = mq('(min-width: 1024px)');
+  gsap.matchMedia().add({ desk: '(min-width: 1024px)', mob: '(max-width: 1023.98px)' }, (ctx) => {
+  const { desk } = ctx.conditions;
   ScrollTrigger.create({
     trigger: desk ? media : frame, start: desk ? 'top 60%' : 'top 85%', end: desk ? 'bottom 75%' : 'bottom 30%',
     onUpdate: (s) => {
@@ -66,56 +70,70 @@ export function initExperiencia() {
       if (t > 0.97) todos.classList.add('is-in');
     },
   });
+  });
 }
 
-/* ---------- MOMENTOS: o show em cortes (palco preso no desktop) ---------- */
+/* ---------- MOMENTOS: o show em cortes (palco preso no desktop) ----------
+   gsap.matchMedia: liga e desliga a cena quando a tela cruza 1024 px (girar o tablet, redimensionar a janela)
+   e limpa os estilos ao sair, para a faixa do celular voltar inteira. */
 export function initMomentos() {
-  const sec = $('#momentos'); if (!sec) return;
-  if (reduce || !mq('(min-width: 1024px)')) return;
+  const sec = $('#momentos'); if (!sec || reduce) return;
   const stage = $('.mo__stage', sec), layers = $$('.mo__layer', sec), head = $('.mo__head', sec), label = $('.mo__label', sec);
   const edge = $('.mo__edge', sec), nameEl = $('[data-mo-name]', sec), iEl = $('[data-mo-i]', sec), nEl = $('[data-mo-n]', sec);
   const prog = $('.mo__progress', sec);
   const N = layers.length;
-  nEl.textContent = String(N).padStart(2, '0');
-  prog.innerHTML = layers.map(() => '<i></i>').join('');
-  const ticks = $$('i', prog);
   const imgs = layers.map((l) => $('img', l));
   const INTRO = 35, SEG = 48, CUT = 0.6, TOTAL = INTRO + (N - 1) * SEG;
-  let cur = -1;
-  function setName(i) {
-    if (i === cur) return; cur = i;
-    iEl.textContent = String(i + 1).padStart(2, '0');
-    nameEl.textContent = layers[i].dataset.name;
-    ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
-    gsap.fromTo(nameEl, { clipPath: 'polygon(0 0, 0 0, -60% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 160% 0, 100% 100%, 0 100%)', duration: 0.5, ease: 'power3.inOut', overwrite: true });
-  }
-  // carrega as próximas fotos à medida que o palco avança
-  imgs.forEach((im, i) => { if (i > 1) im.loading = 'lazy'; });
-  function render(P) {
-    const v = P * TOTAL, w = stage.clientWidth, h = stage.clientHeight;
-    head.style.opacity = (1 - smooth(18, 34, v)).toFixed(3);
-    head.style.transform = `translateY(calc(-50% - ${(smooth(18, 34, v) * 40).toFixed(1)}px))`;
-    label.style.opacity = smooth(32, 38, v).toFixed(3);
-    imgs[0].style.transform = `scale(${(1.08 - 0.08 * smooth(0, INTRO, v)).toFixed(4)})`;
-    let idx = 0, edgeCss = 'polygon(0 0,0 0,0 0)';
-    for (let j = 1; j < N; j++) {
-      const s0 = INTRO + (j - 1) * SEG;
-      const c = clamp((v - s0) / (SEG * CUT));
-      const t = cutEase(c);
-      const L = layers[j];
-      if (c <= 0) { L.style.clipPath = 'polygon(0 0,0 0,0 100%,0 100%)'; }
-      else if (c >= 1) { L.style.clipPath = 'none'; }
-      else { const p = cortePolygon(t, w, h); L.style.clipPath = p.css; edgeCss = corteEdge(p.xb, p.xt, w, h, 3); }
-      imgs[j].style.transform = `scale(${(1.12 - 0.12 * t).toFixed(4)})`;
-      layers[j - 1].style.setProperty('--dim', (0.4 * t).toFixed(3));
-      if (c >= 0.5) idx = j;
-      if (c > 0 && j + 1 < N) imgs[j + 1].loading = 'eager';
+  gsap.matchMedia().add('(min-width: 1024px)', () => {
+    nEl.textContent = String(N).padStart(2, '0');
+    prog.innerHTML = layers.map(() => '<i></i>').join('');
+    const ticks = $$('i', prog);
+    let cur = -1;
+    function setName(i) {
+      if (i === cur) return; cur = i;
+      iEl.textContent = String(i + 1).padStart(2, '0');
+      nameEl.textContent = layers[i].dataset.name;
+      ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
+      const c = corteVals(nameEl);
+      gsap.fromTo(nameEl, { clipPath: c.from }, { clipPath: c.to, duration: 0.5, ease: 'power3.inOut', overwrite: true });
     }
-    edge.style.clipPath = edgeCss;
-    setName(idx);
-  }
-  ScrollTrigger.create({ trigger: $('.mo__pin', sec), start: 'top top', end: 'bottom bottom', onUpdate: (s) => render(s.progress), onRefresh: (s) => render(s.progress) });
-  render(0);
+    // carrega as próximas fotos à medida que o palco avança
+    imgs.forEach((im, i) => { if (i > 1) im.loading = 'lazy'; });
+    function render(P) {
+      const v = P * TOTAL, w = stage.clientWidth, h = stage.clientHeight;
+      head.style.opacity = (1 - smooth(18, 34, v)).toFixed(3);
+      head.style.transform = `translateY(calc(-50% - ${(smooth(18, 34, v) * 40).toFixed(1)}px))`;
+      label.style.opacity = smooth(32, 38, v).toFixed(3);
+      imgs[0].style.transform = `scale(${(1.08 - 0.08 * smooth(0, INTRO, v)).toFixed(4)})`;
+      let idx = 0, edgeCss = 'polygon(0 0,0 0,0 0)';
+      for (let j = 1; j < N; j++) {
+        const s0 = INTRO + (j - 1) * SEG;
+        const c = clamp((v - s0) / (SEG * CUT));
+        const t = cutEase(c);
+        const L = layers[j];
+        if (c <= 0) { L.style.clipPath = 'polygon(0 0,0 0,0 100%,0 100%)'; }
+        else if (c >= 1) { L.style.clipPath = 'none'; }
+        else { const p = cortePolygon(t, w, h); L.style.clipPath = p.css; edgeCss = corteEdge(p.xb, p.xt, w, h, 3); }
+        imgs[j].style.transform = `scale(${(1.12 - 0.12 * t).toFixed(4)})`;
+        // camada própria só enquanto a foto está sendo cortada (sem 18 camadas de tela cheia o tempo todo)
+        imgs[j].style.willChange = c > 0 && c < 1 ? 'transform' : '';
+        layers[j - 1].style.setProperty('--dim', (0.4 * t).toFixed(3));
+        if (c >= 0.5) idx = j;
+        if (c > 0 && j + 1 < N) imgs[j + 1].loading = 'eager';
+      }
+      edge.style.clipPath = edgeCss;
+      setName(idx);
+    }
+    ScrollTrigger.create({ trigger: $('.mo__pin', sec), start: 'top top', end: 'bottom bottom', onUpdate: (s) => render(s.progress), onRefresh: (s) => render(s.progress) });
+    render(0);
+    return () => {
+      gsap.killTweensOf(nameEl);
+      layers.forEach((L) => { L.style.clipPath = ''; L.style.removeProperty('--dim'); });
+      imgs.forEach((im) => { im.style.transform = ''; im.style.willChange = ''; });
+      [head, label, edge, nameEl].forEach((el) => { el.style.opacity = ''; el.style.transform = ''; el.style.clipPath = ''; });
+      prog.innerHTML = '';
+    };
+  });
 }
 
 /* ---------- O SHOW É ÚNICO: o feixe se alarga até virar o palco inteiro ---------- */
@@ -181,10 +199,12 @@ export function initEmpresas() {
     R.forEach((r) => {
       const tracks = $$('.em__track', r.el);
       // cópias suficientes para cobrir a tela mesmo em monitores largos
+      const w0 = r.w;
       r.w = tracks[0].getBoundingClientRect().width;
       const need = Math.ceil((window.innerWidth * 1.2) / Math.max(1, r.w)) + 1;
       for (let n = tracks.length; n < need; n++) { const c = tracks[1].cloneNode(true); r.el.appendChild(c); }
-      r.x = r.dir > 0 ? -r.w * 0.37 : -r.w * 0.11;
+      // primeira medida: posição inicial; depois, mantém a fase (sem salto)
+      r.x = w0 ? (r.x / w0) * r.w : (r.dir > 0 ? -r.w * 0.37 : -r.w * 0.11);
     });
   }
   let active = false, paused = false, boost = 0, lastY = window.scrollY;
@@ -204,7 +224,8 @@ export function initEmpresas() {
   if ('IntersectionObserver' in window) new IntersectionObserver((es) => { active = es[0].isIntersecting; }, { rootMargin: '120px 0px' }).observe(box);
   else active = true;
   measure();
-  window.addEventListener('resize', measure);
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; measure(); });   // só largura (a barra do celular muda a altura)
   const BASE = window.innerWidth < 600 ? 26 : 38;          // px/s
   gsap.ticker.add((time, dt) => {
     const y = window.scrollY, dy = Math.abs(y - lastY); lastY = y;
@@ -287,33 +308,35 @@ export function initFooter() {
    - A capa do player inclina levemente com o mouse e o feixe largo da capa segue o ponteiro.
    - O clique no play dispara os feixes através da tela. */
 export function initVideoStage() {
-  const sec = $('#videos'), pl = $('[data-player]'); if (!sec || !pl) return;
-  const desk = mq('(min-width: 1024px)');
-  if (!reduce && desk) ScrollTrigger.create({
-    trigger: pl, start: 'top bottom', end: 'top 35%',
-    onUpdate: (s) => pl.style.setProperty('--rx', `${(14 * (1 - inOut(s.progress))).toFixed(2)}deg`),
-  });
-  if (reduce) return;
-
+  const sec = $('#videos'), pl = $('[data-player]'); if (!sec || !pl || reduce) return;
   const isPlaying = () => pl.classList.contains('is-live') && !pl.classList.contains('is-paused');
-
-  // ---- capa: inclinação e feixe que segue o mouse ----
   const screen = $('.pl__screen', pl), cover = $('[data-pl-cover]', pl);
-  if (screen && cover && fine && desk) {
-    screen.addEventListener('pointermove', (e) => {
+  const zera = () => { pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg'); };
+  gsap.matchMedia().add('(min-width: 1024px)', () => {
+    // o player "levanta" em perspectiva ao entrar
+    ScrollTrigger.create({
+      trigger: pl, start: 'top bottom', end: 'top 35%',
+      onUpdate: (s) => pl.style.setProperty('--rx', `${(14 * (1 - inOut(s.progress))).toFixed(2)}deg`),
+    });
+    if (!screen || !cover || !fine) return () => pl.style.removeProperty('--rx');
+    // capa: inclinação e feixe que segue o mouse
+    const move = (e) => {
       if (e.pointerType !== 'mouse') return;
       const r = screen.getBoundingClientRect(), x = clamp((e.clientX - r.left) / r.width), y = clamp((e.clientY - r.top) / r.height);
       cover.style.setProperty('--mx', x.toFixed(3));
-      if (isPlaying()) { pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg'); return; }
+      if (isPlaying()) { zera(); return; }
       pl.style.setProperty('--ty', `${((x - 0.5) * 5).toFixed(2)}deg`);
       pl.style.setProperty('--tx', `${((0.5 - y) * 3.5).toFixed(2)}deg`);
-    }, { passive: true });
-    screen.addEventListener('pointerleave', () => { pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg'); cover.style.setProperty('--mx', '.5'); });
-  }
+    };
+    const leave = () => { zera(); cover.style.setProperty('--mx', '.5'); };
+    screen.addEventListener('pointermove', move, { passive: true });
+    screen.addEventListener('pointerleave', leave);
+    return () => { screen.removeEventListener('pointermove', move); screen.removeEventListener('pointerleave', leave); leave(); pl.style.removeProperty('--rx'); };
+  });
   if (cover) cover.addEventListener('click', () => {
     if (isPlaying()) return;
     cover.classList.remove('is-go'); void cover.offsetWidth; cover.classList.add('is-go');
-    pl.style.setProperty('--ty', '0deg'); pl.style.setProperty('--tx', '0deg');
+    zera();
     setTimeout(() => cover.classList.remove('is-go'), 1400);
   });
 }

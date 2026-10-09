@@ -314,10 +314,14 @@ export function initOpening() {
       }
       sync(); paint(audible());
     });
+    let fr = 0;
     gsap.ticker.add(() => {
       const v = audible(); paint(v);
+      // escondido (telão, rodapé, aba em segundo plano) não desenha nada; sem som, a ondulação lenta roda a 15 quadros/s
+      if (document.hidden || somBtn.classList.contains('is-away')) return;
+      if (!v && (++fr % 4)) return;
       const b = v ? audio.bands() : null;
-      t += 0.05;
+      t += v ? 0.05 : 0.2;
       bars.forEach((el, i) => el.style.setProperty('--e', (b ? 0.25 + 0.75 * Math.min(1, b[Math.min(i, 2)] * 1.6) : 0.3 + (v ? 0.4 : 0.12) * Math.sin(t + i * 1.1)).toFixed(3)));
     });
     // fora do caminho
@@ -337,10 +341,13 @@ export function initOpening() {
       // desvio (desktop): algo clicável embaixo do controle?
       let under = false;
       if (!off && !narrow) {
-        const y = window.innerHeight - 29;
-        for (const x of [14, 34, 54]) {
-          const hit = document.elementsFromPoint(x, y).find((n) => !somBtn.contains(n));
-          if (hit && hit !== document.body && hit !== html && hit.closest('a, button, input, select, textarea, label, [role="slider"], [tabindex]:not([tabindex="-1"])')) { under = true; break; }
+        // confere uma grade sobre a área do controle aberto (com o nome), não só uma linha
+        const H = window.innerHeight;
+        busca: for (const y of [H - 40, H - 29, H - 18]) {
+          for (const x of [12, 36, 60, 84, 108, 132]) {
+            const hit = document.elementsFromPoint(x, y).find((n) => !somBtn.contains(n));
+            if (hit && hit !== document.body && hit !== html && hit.closest('a, button, input, select, textarea, label, [role="slider"], [tabindex]:not([tabindex="-1"])')) { under = true; break busca; }
+          }
         }
       }
       somBtn.classList.toggle('is-dodge', under);

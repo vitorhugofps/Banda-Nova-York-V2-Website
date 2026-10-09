@@ -3,7 +3,7 @@
      e gira com ela (e com o arraste); a legenda acompanha a foto que está de frente.
    - Grade com recortes por ponto focal, filtros (GSAP Flip) e lightbox acessível.
    - O media kit completo é baixado de uma vez, num ZIP com as pastas Estúdio, Palco e Público (link estático, sem JS). */
-import { $, $$, clamp, reduce, mq, once, RUN, testMode } from '../core/env.js';
+import { $, $$, clamp, reduce, mq, once, RUN, testMode, corteVals } from '../core/env.js';
 import { stopScroll, startScroll } from '../core/scroll.js';
 
 export async function initMediaKit() {
@@ -26,8 +26,9 @@ export async function initMediaKit() {
 
   // prévia curta + "ver todas"
   const more = $('[data-mk-more]', sec);
+  const abrirGrade = () => { if (grid.classList.contains('is-open')) return; grid.classList.add('is-open'); more?.setAttribute('aria-expanded', 'true'); window.ScrollTrigger?.refresh(); };
   more?.addEventListener('click', () => {
-    grid.classList.add('is-open'); more.setAttribute('aria-expanded', 'true');
+    abrirGrade();
     const first = $('.mk__cell.is-more .mk__item', grid); first?.focus({ preventScroll: true });
     window.ScrollTrigger?.refresh();
   });
@@ -41,7 +42,8 @@ export async function initMediaKit() {
     const state = Flip && !reduce ? Flip.getState(cells) : null;
     cells.forEach((c) => c.classList.toggle('is-out', f !== 'todas' && c.dataset.cat !== f));
     cells.forEach((c) => { if (!c.classList.contains('is-out')) c.classList.add('is-in'); });
-    if (state) Flip.from(state, { duration: 0.6, ease: 'power3.inOut', absolute: true, scale: false, onEnter: (els) => window.gsap.fromTo(els, { opacity: 0 }, { opacity: 1, duration: 0.4 }), onLeave: (els) => window.gsap.to(els, { opacity: 0, duration: 0.25 }) });
+    if (state) Flip.from(state, { duration: 0.6, ease: 'power3.inOut', absolute: true, scale: false, onEnter: (els) => window.gsap.fromTo(els, { opacity: 0 }, { opacity: 1, duration: 0.4 }), onLeave: (els) => window.gsap.to(els, { opacity: 0, duration: 0.25 }), onComplete: () => window.ScrollTrigger?.refresh() });
+    else window.ScrollTrigger?.refresh();
   }));
 
   // ---------- lightbox ----------
@@ -55,18 +57,26 @@ export async function initMediaKit() {
     const m = byId.get(seq[at]);
     const im = new Image();
     im.className = 'lb__img'; im.alt = m.alt; im.decoding = 'async'; im.draggable = false; im.sizes = '100vw'; im.srcset = srcset(m); im.src = m.sizes[m.sizes.length - 1].src;
-    const old = $('.lb__img', stage);
+    const olds = $$('.lb__img', stage);   // todas as anteriores (setas rápidas não empilham fotos)
     if (!reduce) { im.classList.add('is-enter'); im.style.setProperty('--kr', '.4'); }
     stage.appendChild(im);
-    const reveal = () => { requestAnimationFrame(() => { im.classList.add('go'); setTimeout(() => old?.remove(), 520); }); };
-    if (reduce) old?.remove(); else if (im.complete) reveal(); else { im.onload = reveal; im.onerror = reveal; }
+    const tira = () => olds.forEach((o) => o.remove());
+    const reveal = () => { requestAnimationFrame(() => { im.classList.add('go'); setTimeout(tira, 520); }); };
+    if (reduce) tira(); else if (im.complete) reveal(); else { im.onload = reveal; im.onerror = reveal; }
     iEl.textContent = String(at + 1).padStart(2, '0'); nEl.textContent = String(seq.length).padStart(2, '0');
     cap.textContent = `${m.alt} · ${data.credit}`;
     [1, -1].forEach((d) => { const n = byId.get(seq[(at + d + seq.length) % seq.length]); const p = new Image(); p.sizes = '100vw'; p.srcset = srcset(n); });
     if (history.replaceState) history.replaceState(null, '', `#foto=${m.id}`);
   }
+  const gradeIds = cells.map((c) => c.dataset.id);
   function open(id, from) {
-    seq = visibleIds(); if (!seq.includes(id)) seq = data.items.map((m) => m.id);
+    if (!gradeIds.includes(id)) return;            // só as fotos do media kit
+    seq = visibleIds();
+    if (!seq.includes(id)) {                       // veio do telão ou de um link: abre a grade inteira, sem filtro
+      abrirGrade();
+      if (cells.some((c) => c.classList.contains('is-out'))) { cells.forEach((c) => c.classList.remove('is-out')); fbtns.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.filter === 'todas'))); }
+      seq = gradeIds.slice();
+    }
     opener = from || document.activeElement;
     lb.showModal(); stopScroll(); show(seq.indexOf(id));
     $('[data-lb-close]', lb).focus();
@@ -76,9 +86,11 @@ export async function initMediaKit() {
     lb.close(); startScroll();
     $$('.lb__img', stage).forEach((n) => n.remove());
     if (history.replaceState) history.replaceState(null, '', location.pathname + location.search + '#media-kit');
-    opener?.focus?.({ preventScroll: true });
+    // o foco volta para quem abriu; se foi o telão (fora da ordem de foco), vai para a foto na grade
+    const ok = opener && opener.isConnected && opener.offsetParent && !opener.closest('[aria-hidden="true"]');
+    (ok ? opener : $(`.mk__item[data-open="${seq[at]}"]`, grid))?.focus?.({ preventScroll: true });
   }
-  grid.addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (b) open(b.dataset.open, b); });
+  grid.addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (!b || e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); open(b.dataset.open, b); });
   $('[data-lb-close]', lb).addEventListener('click', close);
   $('[data-lb-prev]', lb).addEventListener('click', () => show(at - 1, -1));
   $('[data-lb-next]', lb).addEventListener('click', () => show(at + 1, 1));
@@ -98,7 +110,7 @@ export async function initMediaKit() {
     if (Math.abs(dx) > 50 || v > 0.4) { if (Math.abs(dx) > 10) show(at + (dx < 0 ? 1 : -1)); }
   });
   const hash = location.hash.match(/^#foto=([\w-]+)/);
-  if (hash && byId.has(hash[1])) setTimeout(() => open(hash[1]), 400);
+  if (hash && gradeIds.includes(hash[1])) setTimeout(() => open(hash[1]), 400);
 
   // sem menu de "salvar imagem" nas fotos do banco
   [stage, grid].forEach((el) => el.addEventListener('contextmenu', (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); }));
@@ -146,7 +158,7 @@ function initWall(sec, onOpen) {
     if (best !== front) {
       front = best;
       if (iEl) iEl.textContent = String(best + 1).padStart(2, '0');
-      if (capEl) { capEl.textContent = panels[best].dataset.cap || ''; gsap.fromTo(capEl, { clipPath: 'polygon(0 0, 0 0, -40% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 140% 0, 100% 100%, 0 100%)', duration: 0.45, ease: 'power3.out', overwrite: true }); }
+      if (capEl) { capEl.textContent = panels[best].dataset.cap || ''; const c = corteVals(capEl); gsap.fromTo(capEl, { clipPath: c.from }, { clipPath: c.to, duration: 0.45, ease: 'power3.out', overwrite: true }); }
     }
   }
   // acerto do clique em 3D: o painel visível mais frontal cujo retângulo contém o ponto

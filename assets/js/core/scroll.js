@@ -32,10 +32,9 @@ export function y(el) { return el.getBoundingClientRect().top + window.scrollY; 
 
 export function goTo(target, { duration = 1.2, focus = true } = {}) {
   const hd = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hd')) || 64;
-  let top = typeof target === 'number' ? target : (target.id === 'abertura' ? 0 : y(target) - hd);
-  // Seções com palco preso: entrar pelo começo
-  top = Math.max(0, top);
-  scrollToY(top, duration);
+  const alvo = () => Math.max(0, typeof target === 'number' ? target : (target.id === 'abertura' ? 0 : y(target) - hd));
+  // o conteúdo acima pode crescer durante a rolagem (imagens, player): ao chegar, confere e acerta uma vez
+  scrollToY(alvo(), duration, () => { const t2 = alvo(); if (Math.abs(t2 - window.scrollY) > 4) scrollToY(t2, Math.min(0.5, duration)); });
   if (focus && typeof target !== 'number') {
     const f = target.matches('[tabindex], a, button, input') ? target : (target.querySelector('h2, h1') || target);
     if (!f.hasAttribute('tabindex') && !f.matches('a, button, input')) f.setAttribute('tabindex', '-1');
@@ -44,17 +43,26 @@ export function goTo(target, { duration = 1.2, focus = true } = {}) {
 }
 
 let autoT = null;
-export function scrollToY(top, duration = 1.2) {
+export function scrollToY(top, duration = 1.2, after = null) {
   const { lenis } = scroll;
   scroll.auto = true; clearTimeout(autoT);
-  const done = () => { clearTimeout(autoT); autoT = setTimeout(() => { scroll.auto = false; }, 80); };
+  let fim = false;
+  // se a pessoa assumir a rolagem (roda, toque, teclado), não há correção no fim
+  const assumiu = () => { fim = true; };
+  const EV = ['wheel', 'touchstart', 'keydown'];
+  EV.forEach((ev) => window.addEventListener(ev, assumiu, { once: true, passive: true }));
+  const done = () => {
+    clearTimeout(autoT); autoT = setTimeout(() => { scroll.auto = false; }, 80);
+    EV.forEach((ev) => window.removeEventListener(ev, assumiu));
+    if (!fim) { fim = true; after?.(); }
+  };
   autoT = setTimeout(done, duration * 1000 + 400);   // garantia, caso a rolagem seja interrompida
   if (lenis) { lenis.scrollTo(top, { duration, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done }); return; }
   if (reduce) { window.scrollTo(0, top); done(); return; }
   const { gsap } = window;
   const o = { y: window.scrollY };
   let killed = false;
-  const kill = () => { killed = true; done(); };
+  const kill = () => { killed = true; fim = true; done(); };
   window.addEventListener('touchstart', kill, { once: true, passive: true });
   window.addEventListener('wheel', kill, { once: true, passive: true });
   gsap.to(o, { y: top, duration, ease: 'power3.inOut', onUpdate: () => { if (!killed) window.scrollTo(0, o.y); }, onComplete: done });

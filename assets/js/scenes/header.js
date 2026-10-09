@@ -2,7 +2,7 @@
    some quando a pessoa passa o slide de vídeo da abertura e, daí em diante, volta sempre que ela rola para cima
    (e some de novo ao rolar para baixo). Também aparece quando recebe foco pelo teclado.
    Cuida ainda do link ativo, do menu do celular e da barra fixa "Quero a Nova York". */
-import { $, $$, reduce, clamp } from '../core/env.js';
+import { $, $$, reduce, clamp, corteVals } from '../core/env.js';
 import { stopScroll, startScroll, scroll } from '../core/scroll.js';
 
 export function initHeader() {
@@ -67,7 +67,7 @@ export function initHeader() {
   let lastFocus = null;
   const open = () => {
     lastFocus = document.activeElement; menu.hidden = false; openBtn.setAttribute('aria-expanded', 'true'); stopScroll();
-    if (!reduce) gsap.fromTo(menu, { clipPath: 'polygon(0 0, 0 0, -67% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 167% 0, 100% 100%, 0 100%)', duration: 0.6, ease: 'power3.inOut' });
+    if (!reduce) { const c = corteVals(menu); gsap.fromTo(menu, { clipPath: c.from }, { clipPath: c.to, duration: 0.6, ease: 'power3.inOut', clearProps: 'clipPath' }); }
     $('a', menu).focus();
   };
   const close = (focusBack = true) => { menu.hidden = true; openBtn.setAttribute('aria-expanded', 'false'); startScroll(); if (focusBack && lastFocus) lastFocus.focus(); };

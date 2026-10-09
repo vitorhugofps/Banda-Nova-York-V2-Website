@@ -4,7 +4,7 @@
    - Modo "clean" (padrão): iframe sem controles, sem cliques e recortado (60 px acima e abaixo), capa/controles/estados da marca.
    - Modo "compat": iframe inteiro, sem nada por cima (configurável em ny-config.playerMode).
    Máquina de estados: idle → arming → ready → playing ⇄ paused · buffering · ended · blocked/unavailable/error. */
-import { $, $$, clamp, config, testMode, reduce } from '../core/env.js';
+import { $, $$, clamp, config, testMode, reduce, corteVals } from '../core/env.js';
 import { bus } from '../core/bus.js';
 
 const CACHE = 'ny-videos-v1', CACHE_MS = 6 * 3600e3;
@@ -12,7 +12,8 @@ const MESES = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', '
 const DATE_TITLE = /^\s*\d{1,2} de [a-zç]+ de \d{4}\s*$/i;
 
 export function cleanTitle(t, id, titles = {}) {
-  if (titles[id]) return titles[id].replace(/Nova York/g, 'Nova\u00a0York');
+  // só títulos curados de verdade (um id como "constructor" não pode cair no protótipo do objeto)
+  if (titles && Object.prototype.hasOwnProperty.call(titles, id) && typeof titles[id] === 'string') return titles[id].replace(/Nova York/g, 'Nova\u00a0York');
   t = String(t || '').replace(/[\u{1F000}-\u{1FFFF}☀-➿️]/gu, '').trim();
   t = t.replace(/\s*[-–|]\s*Contatos?:.*$/i, '').replace(/^banda nova york\s*[-–|:]\s*/i, '').replace(/^[\s\-–]+|[\s\-–]+$/g, '');
   if (DATE_TITLE.test(t)) return 'Registro de show';
@@ -278,7 +279,8 @@ export function initPlayer() {
     const changedOrient = S.items[i].isShort !== S.items[S.idx]?.isShort;
     S.idx = i; S.retry = 0; hideState();
     if (changedOrient && window.gsap && !reduce) {
-      window.gsap.fromTo(thumb, { clipPath: 'polygon(0 0, 0 0, -60% 100%, 0 100%)' }, { clipPath: 'polygon(0 0, 160% 0, 100% 100%, 0 100%)', duration: 0.7, delay: 0.15, ease: 'power3.inOut', clearProps: 'clipPath' });
+      const c = corteVals(thumb);
+      window.gsap.fromTo(thumb, { clipPath: c.from }, { clipPath: c.to, duration: 0.7, delay: 0.15, ease: 'power3.inOut', clearProps: 'clipPath' });
     }
     paintCover();
     prog.style.setProperty('--p', '0%'); cur.textContent = '00:00'; dur.textContent = '00:00';
@@ -356,7 +358,8 @@ export function initPlayer() {
   // uma mídia por vez
   bus.on('media:claim', (who) => { if (who !== 'yt' && S.state === 'playing') pause(); });
 
-  // o YouTube só carrega quando a pessoa mostra intenção (mouse sobre o player, foco ou toque), nunca só por rolar
+  // o YouTube só carrega quando a pessoa mostra intenção (mouse sobre o player, foco ou toque no player), nunca só por rolar a página.
+  // No celular o toque arma antes do play de propósito: assim o vídeo já está pronto quando o play é tocado (o iOS exige o gesto).
   ['pointerenter', 'focusin', 'touchstart'].forEach((ev) => root.addEventListener(ev, () => arm(), { once: true, passive: true }));
 
   loadData();
