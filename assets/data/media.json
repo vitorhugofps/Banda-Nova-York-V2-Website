@@ -1,5 +1,5 @@
 {
- "version": "2026-10-05",
+ "version": "2026-10-09",
  "credit": "Divulgação · Banda Nova York",
  "items": [
   {
@@ -953,6 +953,189 @@
      "src": "/assets/media/img/elenco-branco-pb-1600.webp"
     }
    ]
+  },
+  {
+   "id": "reggaeton",
+   "cat": "palco",
+   "orient": "h",
+   "w": 1536,
+   "h": 864,
+   "focus": {
+    "x": 0.55,
+    "y": 0.3
+   },
+   "pos": "55% 30%",
+   "bg": "#233323",
+   "alt": "Os artistas da Nova York em formação no palco verde, de preto e verde-neon",
+   "moment": "reggaeton",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 360,
+     "src": "/assets/media/img/reggaeton-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 576,
+     "src": "/assets/media/img/reggaeton-1024.webp"
+    },
+    {
+     "w": 1536,
+     "h": 864,
+     "src": "/assets/media/img/reggaeton-1536.webp"
+    }
+   ]
+  },
+  {
+   "id": "axe",
+   "cat": "palco",
+   "orient": "h",
+   "w": 2622,
+   "h": 1206,
+   "focus": {
+    "x": 0.62,
+    "y": 0.3
+   },
+   "pos": "62% 30%",
+   "bg": "#603f4f",
+   "alt": "Cantora de rosa ao microfone, com artistas dançando diante do painel de grafite rosa",
+   "moment": "axe",
+   "sizes": [
+    {
+     "w": 640,
+     "h": 294,
+     "src": "/assets/media/img/axe-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 471,
+     "src": "/assets/media/img/axe-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 736,
+     "src": "/assets/media/img/axe-1600.webp"
+    },
+    {
+     "w": 2400,
+     "h": 1104,
+     "src": "/assets/media/img/axe-2400.webp"
+    }
+   ]
+  },
+  {
+   "id": "estudio-dourado",
+   "cat": "estudio",
+   "orient": "h",
+   "w": 1774,
+   "h": 887,
+   "focus": {
+    "x": 0.5,
+    "y": 0.42
+   },
+   "pos": "50% 42%",
+   "bg": "#090300",
+   "alt": "Os artistas da Nova York em estúdio, de preto, vermelho e branco, com luz dourada ao fundo",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 320,
+     "src": "/assets/media/img/estudio-dourado-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 512,
+     "src": "/assets/media/img/estudio-dourado-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 800,
+     "src": "/assets/media/img/estudio-dourado-1600.webp"
+    },
+    {
+     "w": 1774,
+     "h": 887,
+     "src": "/assets/media/img/estudio-dourado-1774.webp"
+    }
+   ],
+   "fit": "contain"
+  },
+  {
+   "id": "estudio-vermelho",
+   "cat": "estudio",
+   "orient": "h",
+   "w": 1920,
+   "h": 819,
+   "focus": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "pos": "50% 50%",
+   "bg": "#0a0a0a",
+   "alt": "Os artistas da Nova York em estúdio, com figurinos de couro preto, vermelho e branco",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 273,
+     "src": "/assets/media/img/estudio-vermelho-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 437,
+     "src": "/assets/media/img/estudio-vermelho-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 683,
+     "src": "/assets/media/img/estudio-vermelho-1600.webp"
+    },
+    {
+     "w": 1920,
+     "h": 819,
+     "src": "/assets/media/img/estudio-vermelho-1920.webp"
+    }
+   ],
+   "fit": "contain"
+  },
+  {
+   "id": "estudio-preto",
+   "cat": "estudio",
+   "orient": "h",
+   "w": 1672,
+   "h": 941,
+   "focus": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "pos": "50% 50%",
+   "bg": "#0a0a0a",
+   "alt": "Os artistas da Nova York em estúdio, todos de couro preto",
+   "moment": null,
+   "sizes": [
+    {
+     "w": 640,
+     "h": 360,
+     "src": "/assets/media/img/estudio-preto-640.webp"
+    },
+    {
+     "w": 1024,
+     "h": 576,
+     "src": "/assets/media/img/estudio-preto-1024.webp"
+    },
+    {
+     "w": 1600,
+     "h": 900,
+     "src": "/assets/media/img/estudio-preto-1600.webp"
+    },
+    {
+     "w": 1672,
+     "h": 941,
+     "src": "/assets/media/img/estudio-preto-1672.webp"
+    }
+   ],
+   "fit": "contain"
   }
  ]
 }

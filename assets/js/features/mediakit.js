@@ -1,7 +1,8 @@
 /* MEDIA KIT · banco de imagens
    - Telão de LED curvo em 3D (CSS): câmera no centro de um anel de fotos. Fica preso na tela por um bom trecho da rolagem
      e gira com ela (e com o arraste); a legenda acompanha a foto que está de frente.
-   - Grade com recortes por ponto focal, filtros (GSAP Flip) e lightbox acessível. O site não oferece download das fotos. */
+   - Grade com recortes por ponto focal, filtros (GSAP Flip) e lightbox acessível.
+   - O media kit completo é baixado de uma vez, num ZIP com as pastas Estúdio, Palco e Público (link estático, sem JS). */
 import { $, $$, clamp, reduce, mq, once, RUN, testMode } from '../core/env.js';
 import { stopScroll, startScroll } from '../core/scroll.js';
 
