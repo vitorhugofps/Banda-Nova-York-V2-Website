@@ -202,12 +202,13 @@ export function initOpening() {
   }
 
   // ---------- "deslize para baixo": clique ou toque faz a travessia do O ----------
+  // para em .6: o feixe já passou e o manifesto começa a acender (convite para seguir rolando)
   if (desliza && trig) {
     desliza.addEventListener('click', () => {
       if (deitado.matches) return;
       snapping = true;
-      scrollToY(trig.start + 0.5 * (trig.end - trig.start), 1.6);
-      setTimeout(() => { snapping = false; }, 1900);
+      scrollToY(trig.start + 0.6 * (trig.end - trig.start), 2);
+      setTimeout(() => { snapping = false; }, 2300);
     });
   }
   const mostraDesliza = (ms) => { if (desliza && !reduce) setTimeout(() => desliza.classList.add('is-on'), ms); };
