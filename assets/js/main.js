@@ -8,6 +8,10 @@ import { initOpening } from './scenes/opening.js';
 import { initHeader } from './scenes/header.js';
 import { initReveals, initExperiencia, initAssinatura, initMomentos, initFiguras, initShowUnico, initEmpresas, initVideoStage, initFooter } from './scenes/sections.js';
 
+// avisa o script do <head> que o site subiu; se a rede atrasou e a página já tinha caído na versão sem JS, volta
+window.__nyBoot = true;
+{ const h = document.documentElement; if (h.classList.contains('no-js')) { h.classList.remove('no-js'); h.classList.add('js'); } }
+
 registrarOrigem();
 
 // --kr: avanço horizontal do corte de 56° em relação à largura de cada elemento

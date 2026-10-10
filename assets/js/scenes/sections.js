@@ -35,17 +35,65 @@ export function initReveals() {
   });
 }
 
-/* ---------- ASSINATURA: cada palavra abre a largura (62 → 100) e mostra mais do palco ---------- */
+/* ---------- ASSINATURA: cada palavra abre a largura (62 → 100) e mostra mais do palco ----------
+   A foto/vídeo aparece pelas letras com uma máscara vazada: um SVG por cima, pintado com o preto da página e com a
+   palavra recortada. Antes eram camadas com mix-blend-mode, que o Safari não aplica sobre vídeo (Performance e Energia
+   ficavam pretas). A linha de base do texto segue a mesma conta do CSS (linha de .9em centralizada, padding-top .02em). */
+const SVGNS = 'http://www.w3.org/2000/svg';
+let nVaz = 0;
+let ctxMetricas = null;
+function vazado(row) {
+  const fill = $('.as__fill', row), span = $('.as__mask', row);
+  if (!fill || !span) return null;
+  const id = `as-vaz-${++nVaz}`;
+  const svg = document.createElementNS(SVGNS, 'svg');
+  svg.setAttribute('class', 'as__vaz'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+  svg.innerHTML = `<defs><mask id="${id}"><rect width="100%" height="100%" fill="#fff"/><text class="as__vaz-t" x="2" y="0" fill="#000"></text></mask></defs><rect width="100%" height="100%" fill="currentColor" mask="url(#${id})"/>`;
+  const txt = svg.querySelector('text');
+  const palavra = span.textContent.trim();
+  txt.textContent = getComputedStyle(span).textTransform === 'uppercase' ? palavra.toLocaleUpperCase('pt-BR') : palavra;
+  fill.appendChild(svg);
+  const posiciona = () => {
+    const cs = getComputedStyle(span), fs = parseFloat(cs.fontSize) || 0;
+    if (!fs) return;
+    txt.style.fontSize = `${fs}px`;
+    ctxMetricas ||= document.createElement('canvas').getContext('2d');
+    let a = 0, d = 0;
+    if (ctxMetricas) {
+      ctxMetricas.font = `${cs.fontWeight} ${fs}px ${cs.fontFamily}`;
+      const m = ctxMetricas.measureText('H'); a = m.fontBoundingBoxAscent || 0; d = m.fontBoundingBoxDescent || 0;
+    }
+    const lh = parseFloat(cs.lineHeight) || 0.9 * fs, pt = parseFloat(cs.paddingTop) || 0;
+    const topo = pt + (span.clientHeight - pt - lh) / 2;
+    const y = a && d ? topo + (lh - (a + d)) / 2 + a : topo + 0.8 * lh;
+    txt.setAttribute('y', (y + 2).toFixed(2));   // o SVG começa 2 px acima da caixa
+  };
+  return { txt, posiciona };
+}
+
 export function initAssinatura() {
-  const rows = $$('[data-row]'); if (!rows.length || reduce) return;
+  const rows = $$('[data-row]'); if (!rows.length) return;
+  const sec = rows[0].closest('.as');
+  const vaz = rows.map(vazado);
+  if (sec && vaz.every(Boolean)) {
+    sec.classList.add('as--vaz');
+    const todas = () => vaz.forEach((v) => v.posiciona());
+    todas();
+    document.fonts?.ready.then(todas);
+    window.addEventListener('resize', todas);
+  }
+  if (reduce) return;
   const largo = window.matchMedia('(min-width: 1024px)');
-  rows.forEach((row) => {
-    const mask = $('.as__mask', row), src = $('.as__src', row), bar = $('.as__bar', row);
+  rows.forEach((row, i) => {
+    const mask = $('.as__mask', row), src = $('.as__src', row), bar = $('.as__bar', row), txt = vaz[i] && vaz[i].txt;
     ScrollTrigger.create({
       trigger: row, start: 'top 92%', end: 'top 38%',
       onUpdate: (s) => {
         const t = inOut(s.progress);
-        if (largo.matches) mask.style.setProperty('--wdth', (62 + 38 * t).toFixed(1)); else mask.style.removeProperty('--wdth');
+        if (largo.matches) {
+          const w = (62 + 38 * t).toFixed(1);
+          mask.style.setProperty('--wdth', w); if (txt) txt.style.setProperty('--wdth', w);
+        } else { mask.style.removeProperty('--wdth'); if (txt) txt.style.removeProperty('--wdth'); }
         bar.style.setProperty('--bar', (0.15 + 0.85 * t).toFixed(3));
       },
     });

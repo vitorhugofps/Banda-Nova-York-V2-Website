@@ -13,13 +13,15 @@ import { bus } from '../core/bus.js';
 import { scrollToY, y as docY } from '../core/scroll.js';
 
 const OX = 427.6, OY = 386.1, R_COUNTER = 84.8, R_HIDE = 124.8;
+const deitado = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+const Z_REPOUSO = 0.25;   // escala do vídeo com o logo em repouso (o quadro inteiro, pequeno, centrado no O)
 const VB = { x: 26, y: 95.25, w: 2121, h: 478.5 };
 
 export function initOpening() {
   const sec = $('#abertura');
   if (!sec) return null;
   const { gsap, ScrollTrigger } = window;
-  const stage = $('.op__stage', sec), media = $('.op__media', sec), video = $('.op__video', sec), tint = $('.op__tint', sec);
+  const stage = $('.op__stage', sec), media = $('.op__media', sec), video = $('.op__video', sec);
   const svg = $('.op__logo', sec), xf = $('.op__xf', sec), scrim = $('.op__scrim', sec), feixe = $('.op__feixe', sec);
   const copy = $('.op__copy', sec), manif = $('[data-acender]', sec), assin = $('.op__assin', sec);
   const pauseBtn = $('[data-op-pause]', sec), hd = $('[data-hd]'), xp = $('#experiencia');
@@ -66,6 +68,13 @@ export function initOpening() {
     st.g = { W, H, k0, O0, r0, rHide, C, sMax: Rcov / r0 };
   }
 
+  // transformação do vídeo: centro do quadro sob o O, escala da travessia, leve aproximação e pulso do grave
+  function videoXf() {
+    const v = st.vx || { dx: 0, dy: 0, z: 1 };
+    const k = v.z * (1 + 0.08 * (st.e || 0)) * (1 + 0.03 * (st.bass || 0));
+    return `translate(${v.dx.toFixed(1)}px, ${v.dy.toFixed(1)}px) scale(${k.toFixed(4)})`;
+  }
+
   // ---------- render por progresso ----------
   let lastDone = null;
   function render(p) {
@@ -81,12 +90,20 @@ export function initOpening() {
     if (!done) xf.setAttribute('transform', `matrix(${k.toFixed(5)} 0 0 ${k.toFixed(5)} ${(cx - OX * k).toFixed(2)} ${(cy - OY * k).toFixed(2)})`);
     if (done !== lastDone) { svg.style.visibility = done ? 'hidden' : 'visible'; lastDone = done; }
     media.style.clipPath = done ? 'none' : `circle(${(g.rHide * s * st.ign).toFixed(2)}px at ${cx.toFixed(1)}px ${cy.toFixed(1)}px)`;
-    video.style.transformOrigin = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
+    // Em repouso o O é pequeno: o vídeo encolhe e o centro do quadro (os artistas) fica sob o O; na travessia ele
+    // cresce junto com o círculo (sempre cobrindo o que aparece) até a tela cheia, já centralizado.
+    const R = g.rHide * s * st.ign, meia = 0.5 * Math.min(st.vw, st.vh) || 1;
+    st.vx = { dx: cx - st.vw / 2, dy: cy - st.vh / 2, z: Math.min(1, Math.max(Z_REPOUSO, (1.15 * R) / meia)) };
     st.e = e;
-    video.style.transform = `scale(${((1 + 0.08 * e) * (1 + 0.03 * (st.bass || 0))).toFixed(4)})`;
-    const gray = 1 - smooth(0.55, 1, e);
-    video.style.filter = gray > 0.002 ? `grayscale(${gray.toFixed(3)}) contrast(${(1 + 0.15 * gray).toFixed(3)})` : 'none';
-    tint.style.opacity = gray.toFixed(3);
+    video.style.transform = videoXf();
+    // vídeo em preto e branco tingido do vermelho da marca dentro do O, ganhando cor ao abrir.
+    // O tom vem só de filtros no próprio vídeo: a camada vermelha com mix-blend-mode virava um disco chapado no Safari.
+    // brightness(.28) sepia(1) hue-rotate(-50deg) saturate(8) sobre o cinza: vermelho da marca, um pouco mais claro que o
+    // multiply puro com #E1141E, para o vídeo aparecer bem dentro do O.
+    const cz = 1 - smooth(0.55, 1, e);
+    video.style.filter = cz > 0.002
+      ? `grayscale(${cz.toFixed(3)}) contrast(${(1 + 0.15 * cz).toFixed(3)}) brightness(${(1 - 0.72 * cz).toFixed(3)}) sepia(${cz.toFixed(3)}) hue-rotate(${(-50 * cz).toFixed(1)}deg) saturate(${(1 + 7 * cz).toFixed(2)})`
+      : 'none';
     banda.style.opacity = st.introDone ? (1 - smooth(0.04, 0.16, p)).toFixed(3) : banda.style.opacity;
     audio.setOpen(e);
 
@@ -123,16 +140,19 @@ export function initOpening() {
     document.documentElement.classList.add('intro-run');
     setNy(0); setBars(0); banda.style.opacity = 0; st.ign = 0;
   } else { finishIntroState(); }
-  render(0);
+  render(deitado.matches && !reduce ? 1 : 0);
 
   // ---------- pin (seção alta + palco sticky) ----------
   let trig = null;
   if (!reduce) {
+    // celular deitado (até 520 px de altura): o palco não fica preso (CSS) e a travessia caberia em ~130 px de rolagem;
+    // ali a abertura mostra direto o estado final (vídeo em tela cheia, manifesto e assinatura)
     trig = ScrollTrigger.create({
       trigger: sec, start: 'top top', end: 'bottom bottom',
-      onUpdate: (self) => render(self.progress),
-      onRefresh: (self) => { measure(); render(self.progress); },
+      onUpdate: (self) => render(deitado.matches ? 1 : self.progress),
+      onRefresh: (self) => { measure(); render(deitado.matches ? 1 : self.progress); },
     });
+    deitado.addEventListener?.('change', () => ScrollTrigger.refresh());
     // o som segue pelo slide branco e baixa quando ele termina
     if (xp) ScrollTrigger.create({
       trigger: xp, start: 'bottom bottom', end: 'bottom 30%',
@@ -152,7 +172,7 @@ export function initOpening() {
     if (!audio.on || !st.visible) { if (st.bass) { st.bass = 0; render(st.p); } return; }
     const b = audio.bands(); const target = b ? Math.min(1, b[0] * 1.4) : 0;
     st.bass = (st.bass || 0) + (target - (st.bass || 0)) * (target > (st.bass || 0) ? 0.5 : 0.12);
-    video.style.transform = `scale(${((1 + 0.08 * (st.e || 0)) * (1 + 0.03 * st.bass)).toFixed(4)})`;
+    video.style.transform = videoXf();
     if (cur.on && b) cur.bars.forEach((el, i) => el.style.setProperty('--e', (0.35 + 0.65 * Math.min(1, b[i] * 1.5)).toFixed(3)));
   });
 
@@ -160,7 +180,7 @@ export function initOpening() {
   let snapping = false;
   if (trig && !/nosnap/.test(location.search)) {
     ScrollTrigger.addEventListener('scrollEnd', () => {
-      if (snapping || !trig) return;
+      if (snapping || !trig || deitado.matches) return;
       const p = trig.progress;
       if (p > 0.04 && p < 0.5 && window.scrollY < trig.end) {
         snapping = true;
@@ -335,7 +355,8 @@ export function initOpening() {
       rq = 0;
       const narrow = window.innerWidth < 1024;
       const inOpening = window.scrollY < sec.offsetTop + sec.offsetHeight - window.innerHeight * 0.5;
-      const off = away.wall || away.form || away.foot || (menuEl && !menuEl.hidden) || (narrow && !inOpening && !html.classList.contains('has-cta'));
+      // celular deitado: na abertura o controle ficaria sobre o manifesto, então espera a barra vermelha
+      const off = away.wall || away.form || away.foot || (menuEl && !menuEl.hidden) || (narrow && !inOpening && !html.classList.contains('has-cta')) || (deitado.matches && inOpening);
       somBtn.classList.toggle('is-away', off);
       html.classList.toggle('has-som', !off);
       // desvio (desktop): algo clicável embaixo do controle?

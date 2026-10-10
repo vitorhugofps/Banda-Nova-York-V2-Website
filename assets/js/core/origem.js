@@ -10,9 +10,14 @@ export function registrarOrigem() {
   try {
     const u = new URL(location.href), o = {};
     KEYS.forEach((k) => { const v = seguro(u.searchParams.get(k)); if (v) o[k] = v; });
-    const ref = document.referrer ? seguro(new URL(document.referrer).hostname) : '';
-    if (ref && ref !== location.hostname) o.ref = ref;
-    if (!Object.keys(o).length && sessionStorage.getItem(LAST)) return;
+    // referência interna (o próprio site, com ou sem www, ou a ida de http para https) não conta como origem
+    const semWww = (h) => String(h || '').toLowerCase().replace(/^www\./, '');
+    const refHost = document.referrer ? new URL(document.referrer).hostname : '';
+    if (refHost && semWww(refHost) !== semWww(location.hostname)) o.ref = seguro(refHost);
+    // sem UTM nem clique de anúncio, uma nova referência não apaga a campanha já guardada nesta aba
+    const ant = (() => { try { return JSON.parse(sessionStorage.getItem(LAST) || 'null'); } catch (e) { return null; } })();
+    const temCampanha = (x) => !!x && KEYS.some((k) => x[k]);
+    if (!temCampanha(o) && (temCampanha(ant) || (ant && !o.ref))) return;
     o.t = Date.now();
     sessionStorage.setItem(LAST, JSON.stringify(o));
   } catch (e) { /* navegação privada */ }

@@ -125,6 +125,13 @@ function initWall(sec, onOpen) {
   const cam = $('.wall__cam', wall), ring = $('.wall__ring', wall), panels = $$('.wall__p', wall);
   const capEl = $('[data-wall-cap]', wall), iEl = $('[data-wall-i]', wall), nEl = $('[data-wall-n]', wall), progEl = $('[data-wall-prog]', wall);
   const pin = wall.closest('.wall-pin') || wall;
+  // fotos do telão carregam antes de ele chegar: dentro de preserve-3d o loading="lazy" do Safari às vezes nunca dispara
+  const imgsWall = $$('img', wall);
+  const carregaWall = () => imgsWall.forEach((im) => { im.loading = 'eager'; if (im.decode) im.decode().catch(() => {}); });
+  if ('IntersectionObserver' in window) {
+    const ioW = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { carregaWall(); ioW.disconnect(); } }, { rootMargin: '150% 0px' });
+    ioW.observe(pin);
+  } else carregaWall();
   if (nEl) nEl.textContent = String(panels.length).padStart(2, '0');
   let front = -1;
   const N = panels.length, TH = 360 / N;
