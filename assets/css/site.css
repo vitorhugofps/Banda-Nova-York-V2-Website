@@ -401,9 +401,9 @@ html.has-cta { scroll-padding-bottom: 76px; }
    ====================================================================== */
 .mo { position: relative; background: var(--preto); }
 .mo__stage { position: relative; }
-.mo__layer { position: relative; overflow: hidden; background: var(--bg, #111); }
+.mo__layer { position: relative; overflow: hidden; isolation: isolate; background: var(--bg, #111); }
 .mo__layer img { width: 100%; height: 100%; object-fit: cover; }
-.mo__shade, .mo__edge, .mo__label, .mo__progress { display: none; }
+.mo__edge, .mo__progress { display: none; }
 .mo__cap { position: absolute; left: 16px; bottom: 14px; display: flex; flex-direction: column; gap: 2px; font-stretch: 62%; font-weight: 900; text-transform: uppercase; color: var(--branco); font-size: 34px; line-height: .9; text-shadow: 0 1px 18px rgba(0,0,0,.4); }
 .mo__cap .larga { font-size: 11px; color: var(--cinza-claro); font-weight: 600; text-shadow: none; }
 .mo__head { padding-top: clamp(96px, 14vh, 160px); padding-bottom: 40px; }
@@ -428,18 +428,19 @@ html.has-cta { scroll-padding-bottom: 76px; }
   .js:not(.reduce) .mo__pin { height: calc(100svh + var(--mo-scroll, 370) * 1vh); } /* --mo-scroll vem do build: cresce com o nº de momentos */
   .js:not(.reduce) .mo__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
   .js:not(.reduce) .mo__layers { display: block; position: absolute; inset: 0; padding: 0; overflow: hidden; }
-  .js:not(.reduce) .mo__layers .mo__layer { position: absolute; inset: 0; height: auto; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+  .js:not(.reduce) .mo__layers .mo__layer { position: absolute; inset: 0; height: auto; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); isolation: isolate; }
   .js:not(.reduce) .mo__layers .mo__layer:first-child { clip-path: none; }
-  .js:not(.reduce) .mo__layer::after { content: ""; position: absolute; inset: 0; background: var(--preto); opacity: var(--dim, 0); }
-  .js:not(.reduce) .mo__cap { display: none; }
-  .js:not(.reduce) .mo__shade { display: block; position: absolute; inset: 0; pointer-events: none;
+  /* cada foto leva a própria sombra e o próprio nome: o corte de 56° recorta foto e nome juntos,
+     então o nome nunca fica por cima da foto errada (camadas: foto · sombra · nome · escurecimento da foto que sai) */
+  .js:not(.reduce) .mo__layer::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: linear-gradient(90deg, rgba(10,10,10,.78) 0%, rgba(10,10,10,.35) 46%, transparent 70%), linear-gradient(0deg, rgba(10,10,10,.8) 0%, transparent 38%); }
+  .js:not(.reduce) .mo__layer::after { content: ""; position: absolute; inset: 0; z-index: 3; background: var(--preto); opacity: var(--dim, 0); pointer-events: none; }
+  .js:not(.reduce) .mo__cap { z-index: 2; left: var(--pad); right: calc(var(--pad) + 180px); bottom: clamp(48px, 9vh, 96px); gap: 10px;
+    font-size: clamp(80px, calc(11 * var(--vw)), 200px); line-height: .82; text-shadow: none; opacity: var(--lab, 0); }
+  .js:not(.reduce) .mo__cap .larga { color: var(--branco); font-size: 12px; line-height: 1.4; }
+  .js:not(.reduce) .mo__cap-t { display: block; text-wrap: balance; padding-top: .18em; margin-top: -.18em; } /* espaço do acento (AXÉ) */
   .js:not(.reduce) .mo__edge { display: block; position: absolute; inset: 0; background: var(--vermelho); pointer-events: none; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
   .js:not(.reduce) .mo__head { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); padding: 0 var(--pad); max-width: var(--max); margin: auto; }
-  .js:not(.reduce) .mo__label { display: flex; flex-direction: column; gap: 10px; position: absolute; left: var(--pad); right: calc(var(--pad) + 180px); bottom: clamp(48px, 9vh, 96px); opacity: 0; }
-  .js:not(.reduce) .mo__count { color: var(--branco); font-size: 12px; }
-  .js:not(.reduce) .mo__name { font-size: clamp(80px, calc(11 * var(--vw)), 200px); line-height: .82; display: block; text-wrap: balance;
-    padding-top: .18em; margin-top: -.18em; } /* o corte animado não come o acento (AXÉ) */
   .js:not(.reduce) .mo__progress { display: flex; gap: 6px; position: absolute; right: var(--pad); bottom: clamp(56px, 9.5vh, 104px); }
   .js:not(.reduce) .mo__progress i { display: block; width: 5px; height: 22px; background: rgba(255,255,255,.22); transform: skewX(-34deg); }
   .js:not(.reduce) .mo__progress i.on { background: var(--vermelho); }

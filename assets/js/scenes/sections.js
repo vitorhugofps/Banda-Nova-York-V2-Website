@@ -1,5 +1,5 @@
 /* Cenas das seções: CORTE (revelação 56°), LARGURA (assinatura 62→125), Experiência, Momentos, Figurinos, O show é único, Empresas e Rodapé. */
-import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, fine, saveData, cortePolygon, corteEdge, corteVals, once, RUN, testMode } from '../core/env.js';
+import { $, $$, clamp, lerp, smooth, cutEase, inOut, reduce, fine, saveData, cortePolygon, corteEdge, once, RUN, testMode } from '../core/env.js';
 import { scroll } from '../core/scroll.js';
 import { bus } from '../core/bus.js';
 
@@ -74,36 +74,36 @@ export function initExperiencia() {
 }
 
 /* ---------- MOMENTOS: o show em cortes (palco preso no desktop) ----------
-   gsap.matchMedia: liga e desliga a cena quando a tela cruza 1024 px (girar o tablet, redimensionar a janela)
+   Cada foto leva o próprio nome e contagem: o corte de 56° recorta foto e nome juntos, então o texto
+   nunca fica sobre a foto errada. gsap.matchMedia liga e desliga a cena quando a tela cruza 1024 px
    e limpa os estilos ao sair, para a faixa do celular voltar inteira. */
 export function initMomentos() {
   const sec = $('#momentos'); if (!sec || reduce) return;
-  const stage = $('.mo__stage', sec), layers = $$('.mo__layer', sec), head = $('.mo__head', sec), label = $('.mo__label', sec);
-  const edge = $('.mo__edge', sec), nameEl = $('[data-mo-name]', sec), iEl = $('[data-mo-i]', sec), nEl = $('[data-mo-n]', sec);
-  const prog = $('.mo__progress', sec);
+  const stage = $('.mo__stage', sec), layers = $$('.mo__layer', sec), head = $('.mo__head', sec);
+  const edge = $('.mo__edge', sec), prog = $('.mo__progress', sec), pin = $('.mo__pin', sec);
   const N = layers.length;
   const imgs = layers.map((l) => $('img', l));
   const INTRO = 35, SEG = 48, CUT = 0.6, TOTAL = INTRO + (N - 1) * SEG;
   gsap.matchMedia().add('(min-width: 1024px)', () => {
-    nEl.textContent = String(N).padStart(2, '0');
     prog.innerHTML = layers.map(() => '<i></i>').join('');
     const ticks = $$('i', prog);
     let cur = -1;
-    function setName(i) {
-      if (i === cur) return; cur = i;
-      iEl.textContent = String(i + 1).padStart(2, '0');
-      nameEl.textContent = layers[i].dataset.name;
-      ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
-      const c = corteVals(nameEl);
-      gsap.fromTo(nameEl, { clipPath: c.from }, { clipPath: c.to, duration: 0.5, ease: 'power3.inOut', overwrite: true });
-    }
-    // carrega as próximas fotos à medida que o palco avança
-    imgs.forEach((im, i) => { if (i > 1) im.loading = 'lazy'; });
+    // decodifica todas as fotos antes do palco chegar: nenhuma entra pela metade ou em branco no meio do corte
+    let pronto = false;
+    const prepara = () => {
+      if (pronto) return; pronto = true;
+      imgs.forEach((im) => { im.loading = 'eager'; if (im.decode) im.decode().catch(() => {}); });
+    };
+    const io = 'IntersectionObserver' in window
+      ? new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { prepara(); io.disconnect(); } }, { rootMargin: '100% 0px' })
+      : null;
+    if (io) io.observe(pin); else prepara();
     function render(P) {
       const v = P * TOTAL, w = stage.clientWidth, h = stage.clientHeight;
+      if (v > 0) prepara();
       head.style.opacity = (1 - smooth(18, 34, v)).toFixed(3);
       head.style.transform = `translateY(calc(-50% - ${(smooth(18, 34, v) * 40).toFixed(1)}px))`;
-      label.style.opacity = smooth(32, 38, v).toFixed(3);
+      stage.style.setProperty('--lab', smooth(32, 38, v).toFixed(3));
       imgs[0].style.transform = `scale(${(1.08 - 0.08 * smooth(0, INTRO, v)).toFixed(4)})`;
       let idx = 0, edgeCss = 'polygon(0 0,0 0,0 0)';
       for (let j = 1; j < N; j++) {
@@ -111,26 +111,26 @@ export function initMomentos() {
         const c = clamp((v - s0) / (SEG * CUT));
         const t = cutEase(c);
         const L = layers[j];
-        if (c <= 0) { L.style.clipPath = 'polygon(0 0,0 0,0 100%,0 100%)'; }
-        else if (c >= 1) { L.style.clipPath = 'none'; }
+        if (c <= 0) L.style.clipPath = 'polygon(0 0,0 0,0 100%,0 100%)';
+        else if (c >= 1) L.style.clipPath = 'none';
         else { const p = cortePolygon(t, w, h); L.style.clipPath = p.css; edgeCss = corteEdge(p.xb, p.xt, w, h, 3); }
         imgs[j].style.transform = `scale(${(1.12 - 0.12 * t).toFixed(4)})`;
-        // camada própria só enquanto a foto está sendo cortada (sem 18 camadas de tela cheia o tempo todo)
-        imgs[j].style.willChange = c > 0 && c < 1 ? 'transform' : '';
+        // camada própria um pouco antes e durante o corte (sem 9 camadas de tela cheia o tempo todo)
+        imgs[j].style.willChange = v > s0 - SEG * 0.5 && v < s0 + SEG * CUT ? 'transform' : '';
         layers[j - 1].style.setProperty('--dim', (0.4 * t).toFixed(3));
         if (c >= 0.5) idx = j;
-        if (c > 0 && j + 1 < N) imgs[j + 1].loading = 'eager';
       }
       edge.style.clipPath = edgeCss;
-      setName(idx);
+      if (idx !== cur) { cur = idx; ticks.forEach((tk, k) => tk.classList.toggle('on', k <= idx)); }
     }
-    ScrollTrigger.create({ trigger: $('.mo__pin', sec), start: 'top top', end: 'bottom bottom', onUpdate: (s) => render(s.progress), onRefresh: (s) => render(s.progress) });
+    ScrollTrigger.create({ trigger: pin, start: 'top top', end: 'bottom bottom', onUpdate: (st) => render(st.progress), onRefresh: (st) => render(st.progress) });
     render(0);
     return () => {
-      gsap.killTweensOf(nameEl);
+      if (io) io.disconnect();
       layers.forEach((L) => { L.style.clipPath = ''; L.style.removeProperty('--dim'); });
       imgs.forEach((im) => { im.style.transform = ''; im.style.willChange = ''; });
-      [head, label, edge, nameEl].forEach((el) => { el.style.opacity = ''; el.style.transform = ''; el.style.clipPath = ''; });
+      [head, edge].forEach((el) => { el.style.opacity = ''; el.style.transform = ''; el.style.clipPath = ''; });
+      stage.style.removeProperty('--lab');
       prog.innerHTML = '';
     };
   });
