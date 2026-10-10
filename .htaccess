@@ -42,20 +42,41 @@ RedirectMatch 404 (?i)\.(md|py|sh|log|bak|sql|ini|lock|map)$
 </IfModule>
 
 <IfModule mod_headers.c>
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
-  Header always set Strict-Transport-Security "max-age=63072000"
-  Header always set X-Frame-Options "DENY"
-  Header always set X-Content-Type-Options "nosniff"
-  Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  Header always set Cross-Origin-Opener-Policy "same-origin"
-  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
-  <FilesMatch "\.(css|js|json|html)$">
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header set Strict-Transport-Security "max-age=63072000"
+  Header set X-Frame-Options "DENY"
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Cross-Origin-Opener-Policy "same-origin"
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+  <FilesMatch "\.(html|css|js|json|txt|xml)$">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Strict-Transport-Security "max-age=63072000"
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Cross-Origin-Opener-Policy "same-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
     Header set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
   <FilesMatch "\.(webp|jpg|jpeg|png|svg|ico|mp4|webm|zip)$">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Strict-Transport-Security "max-age=63072000"
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Cross-Origin-Opener-Policy "same-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
     Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
   </FilesMatch>
-  <FilesMatch "\.woff2$">
+  <FilesMatch "\.(woff2)$">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Strict-Transport-Security "max-age=63072000"
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Cross-Origin-Opener-Policy "same-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
