@@ -1,0 +1,65 @@
+# Banda Nova York · site oficial V03 · gerado por scripts/build-html.py (não editar à mão)
+Options -Indexes
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+AddDefaultCharset utf-8
+AddType image/webp .webp
+AddType video/webm .webm
+AddType video/mp4 .mp4
+AddType font/woff2 .woff2
+AddType image/svg+xml .svg
+
+# arquivos ocultos e internos nunca são servidos (a validação do certificado em /.well-known continua)
+RedirectMatch 404 ^/(?!\.well-known/)\.
+RedirectMatch 404 (?i)\.(md|py|sh|log|bak|sql|ini|lock|map)$
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTPS e endereço sem www
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://bandanovayork.com.br%{REQUEST_URI} [R=301,L]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteRule ^ https://bandanovayork.com.br%{REQUEST_URI} [R=301,L]
+
+  # últimos vídeos do canal (PHP)
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{THE_REQUEST} \s/+api/videos\.php[\s?] [NC]
+  RewriteRule ^ - [R=404,L]
+  RewriteRule ^api/videos/?$ api/videos.php [L]
+
+  # URLs limpas: /index.html → /, /privacidade.html → /privacidade, barra final sai
+  RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+  RewriteRule ^ https://bandanovayork.com.br/ [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+([^.\s?]+)\.html[\s?] [NC]
+  RewriteRule ^ https://bandanovayork.com.br/%1 [R=301,L]
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)/$ https://bandanovayork.com.br/$1 [R=301,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^([a-z0-9-]+)$ $1.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-RugnI2HoRQFmgPLRPCk1xICpwWyKDm/zma3pjJxStWo=' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; manifest-src 'self'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always set Strict-Transport-Security "max-age=63072000"
+  Header always set X-Frame-Options "DENY"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+  <FilesMatch "\.(css|js|json|html)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(webp|jpg|jpeg|png|svg|ico|mp4|webm|zip)$">
+    Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
+  </FilesMatch>
+  <FilesMatch "\.woff2$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript text/javascript application/json image/svg+xml application/xml
+</IfModule>

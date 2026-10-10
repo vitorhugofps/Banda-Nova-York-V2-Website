@@ -17,3 +17,7 @@ assets/brand/BNY_logo_pequeno_preto.svg
 assets/brand/BNY_logo_pequeno_vermelho.svg
 assets/brand/BNY_logo_principal_branco.svg
 assets/brand/BNY_logo_principal_vermelho.svg
+
+# só para a hospedagem Apache (bandanovayork.com.br): a Vercel não usa
+.htaccess
+api/videos.php
