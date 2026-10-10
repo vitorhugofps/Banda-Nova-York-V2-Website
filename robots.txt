@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://bandanovayork.com.br/sitemap.xml
+Sitemap: https://www.bandanovayork.com.br/sitemap.xml
