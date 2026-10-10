@@ -251,6 +251,54 @@ strong { color: var(--branco); font-weight: 700; }
 .op__pause .t-play, .op__pause[aria-pressed="true"] .t-pause { display: none; }
 .op__pause[aria-pressed="true"] .t-play { display: inline; }
 
+/* DESLIZE PARA BAIXO · convite para rolar, na capa, depois que o logo se monta.
+   A escrita larga entra por um Corte 56°, o feixe vermelho atravessa as letras e três barras em Corte (as do carregamento,
+   cada uma menor, formando a ponta para baixo) acendem de cima para baixo. Some nos primeiros pixels de rolagem (opening.js)
+   e volta quando a pessoa sobe ao topo. Clique ou toque faz a travessia do O. */
+.op__desliza { display: none; }
+.js:not(.reduce) .op__desliza {
+  position: absolute; z-index: 5; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center; gap: 13px; padding: 12px 20px;
+  color: var(--branco); cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  transform: translateX(-50%);
+}
+.js .op__desliza:not(.is-on), .op__desliza.is-fora { visibility: hidden; }
+.op__desliza.is-fora * { animation-play-state: paused !important; }
+.op__desliza-t {
+  display: block; padding-left: .22em; font-stretch: 125%; font-weight: 700; font-size: clamp(11px, .78vw, 13px); line-height: 1.4;
+  letter-spacing: .22em; text-transform: uppercase; white-space: nowrap;
+  background: linear-gradient(124deg, var(--branco) 0 44%, var(--vermelho) 44% 56%, var(--branco) 56% 100%) 100% 0 / 300% 100% no-repeat;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  clip-path: polygon(-12px 0, -2px 0, -12px 100%, -12px 100%);
+  transition: clip-path .9s var(--e-cut), -webkit-text-fill-color .25s;
+}
+.op__desliza.is-on .op__desliza-t {
+  clip-path: polygon(-12px 0, calc(100% + 12px) 0, calc(100% + 2px) 100%, -12px 100%);
+  animation: desliza-feixe 2.8s var(--e-cut) 1s infinite;
+}
+@keyframes desliza-feixe { 0% { background-position: 100% 0; } 34%, 100% { background-position: 0 0; } }
+.op__desliza-b { display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform .35s var(--e-out); }
+.op__desliza-b i { display: block; width: 22px; height: 4px; background: var(--cinza); transform: skewX(-34deg); opacity: 0; transition: opacity .5s var(--e-out); }
+.op__desliza-b i:nth-child(2) { width: 15px; }
+.op__desliza-b i:nth-child(3) { width: 8px; }
+.op__desliza.is-on .op__desliza-b i { opacity: 1; animation: desliza-barra 2.8s var(--e-out) 1.2s infinite; }
+.op__desliza.is-on .op__desliza-b i:nth-child(1) { transition-delay: .4s; }
+.op__desliza.is-on .op__desliza-b i:nth-child(2) { transition-delay: .5s; animation-delay: 1.34s; }
+.op__desliza.is-on .op__desliza-b i:nth-child(3) { transition-delay: .6s; animation-delay: 1.48s; }
+@keyframes desliza-barra {
+  0%, 30%, 100% { background-color: var(--cinza); transform: translateY(0) skewX(-34deg); }
+  9% { background-color: var(--vermelho); transform: translateY(3px) skewX(-34deg); }
+}
+@media (min-width: 1024px) {
+  .op__desliza-b i { width: 26px; height: 5px; }
+  .op__desliza-b i:nth-child(2) { width: 18px; }
+  .op__desliza-b i:nth-child(3) { width: 10px; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .op__desliza:hover .op__desliza-t { -webkit-text-fill-color: var(--vermelho); }
+  .op__desliza:hover .op__desliza-b { transform: translateY(4px); }
+}
+
 /* cursor "Ouvir" sobre o vídeo da abertura (só mouse): ponto no ponteiro + etiqueta discreta ao lado */
 .ouvir { position: fixed; left: 0; top: 0; z-index: 95; pointer-events: none; will-change: transform; }
 .ouvir__in {
@@ -1046,6 +1094,8 @@ html.has-cta { scroll-padding-bottom: 76px; }
   .op__copy { bottom: calc(110px + env(safe-area-inset-bottom)); }
   .op__manifesto { font-size: clamp(34px, 10vw, 54px); }
   .op__assin { font-size: 11px; letter-spacing: .12em; white-space: normal; }
+  /* acima da linha do controle de som (canto inferior esquerdo) */
+  .js:not(.reduce) .op__desliza { bottom: calc(52px + env(safe-area-inset-bottom)); }
   .em { --bw: 184px; --bh: 98px; --ls: .64; }
   .em__rows { gap: 8px; }
   .em__track { gap: 8px; padding-right: 8px; }
@@ -1116,6 +1166,7 @@ html.has-cta { scroll-padding-bottom: 76px; }
   .js:not(.reduce) .op__copy { bottom: 16px; }
   .js:not(.reduce) .op__manifesto { font-size: 26px; font-size: clamp(20px, 7svh, 34px); }
   .js:not(.reduce) .op__assin { margin-top: 10px; }
+  .js:not(.reduce) .op__desliza { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .2s !important; scroll-behavior: auto !important; }

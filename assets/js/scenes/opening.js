@@ -3,7 +3,8 @@
    O vídeo aparece por clip-path circle com a borda escondida sob o anel branco. O logo só escala de forma uniforme (nunca gira).
    Fases por progresso p (0–1) da seção presa:
      0–.04 repouso · .04–.50 travessia · .46–.62 feixe 56° · .58–.90 manifesto acende · .88–1 assinatura ganha largura.
-   Sem botões de entrada: a pessoa só rola. O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
+   Sem botões de entrada: a pessoa só rola. Depois que o logo se monta, o convite "Deslize para baixo" aparece no pé da capa
+   (some ao rolar; clique ou toque nele faz a travessia). O som do vídeo entra sozinho quando o navegador permite; se não, no primeiro clique,
    toque ou tecla em qualquer lugar. Com mouse, o cursor vira "Ouvir" sobre o vídeo (e "Silenciar" com som ligado).
    O som vai do começo até o fim do slide branco (A experiência). Depois disso, o controle flutuante "Ouvir"
    (no canto, em todo o site) liga a trilha de novo quando a pessoa quiser; ela segue tocando até ser pausada. */
@@ -27,6 +28,7 @@ export function initOpening() {
   const pauseBtn = $('[data-op-pause]', sec), hd = $('[data-hd]'), xp = $('#experiencia');
   const banda = $('.lg-banda', sec), cpNy = $('.cp-ny__p', sec), cpBl = $('.cp-bl__r', sec), cpBr = $('.cp-br__r', sec);
   const loadBars = $$('.op__load i', sec);
+  const desliza = $('[data-desliza]', sec);
 
   // Manifesto: cada palavra vira um <span class="w"> para acender
   const words = [];
@@ -106,6 +108,14 @@ export function initOpening() {
       : 'none';
     banda.style.opacity = st.introDone ? (1 - smooth(0.04, 0.16, p)).toFixed(3) : banda.style.opacity;
     audio.setOpen(e);
+
+    // "deslize para baixo": desce e some nos primeiros pixels de rolagem; volta quando a pessoa sobe ao topo
+    if (desliza) {
+      const sai = smooth(0.002, 0.03, p);
+      desliza.style.opacity = (1 - sai).toFixed(3);
+      desliza.style.transform = `translate(-50%, ${(18 * sai).toFixed(1)}px)`;
+      desliza.classList.toggle('is-fora', sai > 0.995);
+    }
 
     if (reduce) { hd.classList.add('has-logo'); return; }
     hd.classList.toggle('has-logo', p > 0.44);
@@ -190,6 +200,17 @@ export function initOpening() {
       }
     });
   }
+
+  // ---------- "deslize para baixo": clique ou toque faz a travessia do O ----------
+  if (desliza && trig) {
+    desliza.addEventListener('click', () => {
+      if (deitado.matches) return;
+      snapping = true;
+      scrollToY(trig.start + 0.5 * (trig.end - trig.start), 1.6);
+      setTimeout(() => { snapping = false; }, 1900);
+    });
+  }
+  const mostraDesliza = (ms) => { if (desliza && !reduce) setTimeout(() => desliza.classList.add('is-on'), ms); };
 
   // ---------- vídeo: tocar só visível e sem outra mídia ----------
   // zona do som: da abertura até o fim do slide branco
@@ -280,7 +301,7 @@ export function initOpening() {
     const check = () => {
       if (!st.introDone || !st.visible) { show(false); return; }
       const t = document.elementFromPoint(cur.x, cur.y);
-      show(!!t && stage.contains(t) && !t.closest('a, button, [data-hd]'));
+      show(!!t && stage.contains(t) && !t.closest('a, button, [data-hd], [data-desliza]'));
     };
     window.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') { show(false); return; }
@@ -293,7 +314,7 @@ export function initOpening() {
     stage.addEventListener('pointerdown', () => { if (cur.on) el.classList.add('is-press'); });
     window.addEventListener('pointerup', () => el.classList.remove('is-press'));
     stage.addEventListener('click', (e) => {
-      if (!cur.on || e.target.closest('a, button')) return;
+      if (!cur.on || e.target.closest('a, button, [data-desliza]')) return;
       if (audio.on) { audio.disable(); st.manual = false; }
       else { st.claimed = false; loadVideo(); audio.enable({ play: !st.userPaused }); }
       sync(); label();
@@ -441,10 +462,11 @@ export function initOpening() {
     document.documentElement.classList.remove('intro-run');
     try { sessionStorage.setItem('ny-intro', '1'); } catch (e) { /* privado */ }
     render(st.p);
+    mostraDesliza(250);
   }
 
   if (!introSeen) runIntro();
-  else { const o = { ign: 0 }; gsap.to(o, { ign: 1, duration: reduce ? 0 : 0.3, ease: 'power2.out', onUpdate: () => { st.ign = o.ign; render(st.p); } }); }
+  else { const o = { ign: 0 }; gsap.to(o, { ign: 1, duration: reduce ? 0 : 0.3, ease: 'power2.out', onUpdate: () => { st.ign = o.ign; render(st.p); } }); mostraDesliza(450); }
   // carrega o vídeo logo após a primeira pintura
   if (useVideo) requestAnimationFrame(() => loadVideo());
 
