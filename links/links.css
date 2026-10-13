@@ -54,7 +54,7 @@ h1, h2, h3, p, figure { margin: 0; }
 /* ============================== HERO ============================== */
 .hero { --hf: clamp(360px, 58svh, 560px); --sl: calc(var(--hf) * .6745); position: relative; }
 .hero__foto { position: relative; height: var(--hf); overflow: hidden; background: #2a0a06; }
-.hero__foto img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; }
+.hero__foto img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; }
 .hero__foto::before, .hero__foto::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; }
 .hero__foto::before { top: 0; height: 26%; z-index: 1; background: linear-gradient(rgba(10, 10, 10, .72), rgba(10, 10, 10, 0)); }
 .hero__foto::after { bottom: 0; height: 62%; background: linear-gradient(rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, .78) 58%, var(--preto) 100%); }
