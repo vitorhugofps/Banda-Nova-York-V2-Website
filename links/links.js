@@ -340,7 +340,7 @@ if (dlg && form && typeof dlg.showModal === 'function') {
     if (sug.hidden) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); marca(Math.min(opcoes.length - 1, ativo + 1)); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); marca(Math.max(0, ativo - 1)); }
-    else if (e.key === 'Enter' && ativo >= 0) { e.preventDefault(); escolhe(ativo); }
+    else if (e.key === 'Enter' && ativo >= 0) { e.preventDefault(); e.stopPropagation(); escolhe(ativo); data.focus(); }
     else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); fechaSug(); }
   });
   cidade.addEventListener('blur', () => setTimeout(() => {
@@ -365,7 +365,7 @@ if (dlg && form && typeof dlg.showModal === 'function') {
   // Enter no passo 2 continua (não envia o formulário)
   $('[data-passo="2"]', form).addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.matches('input') && e.target !== cidade) { e.preventDefault(); $('[data-passo="2"] [data-seguir]', form).click(); }
-    else if (e.key === 'Enter' && e.target === cidade && sug.hidden) { e.preventDefault(); uf.focus(); }
+    else if (e.key === 'Enter' && e.target === cidade && sug.hidden) { e.preventDefault(); (uf.value ? data : uf).focus(); }
   });
 
   /* passo 4: contato → WhatsApp */
