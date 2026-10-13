@@ -252,12 +252,12 @@ if (dlg && form && typeof dlg.showModal === 'function') {
   }
 
   /* abre e fecha: o botão Voltar do celular fecha a folha */
-  let abriuEm = null;
+  let abriuEm = null, abertaEm = 0;
   function abre(empurra = true) {
     if (dlg.open) return;
     abriuEm = document.activeElement;
     if (passo === 'ok') { form.reset(); ufAuto = false; vaiPara(1); }
-    dlg.showModal();
+    dlg.showModal(); abertaEm = performance.now();
     html.style.overflow = 'hidden';
     if (empurra && location.hash !== '#contratar') history.pushState({ bk: 1 }, '', '#contratar');
     vaiPara(passo);
@@ -280,7 +280,10 @@ if (dlg && form && typeof dlg.showModal === 'function') {
   $$('[data-abrir]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); abre(); }));
   $$('[data-fechar]', dlg).forEach((b) => b.addEventListener('click', pedeFechar));
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); pedeFechar(); });
-  dlg.addEventListener('click', (e) => { if (e.target === dlg) pedeFechar(); });
+  // fecha tocando no fundo só se o toque começou e terminou no fundo (evita o clique fantasma logo depois de abrir)
+  let tocouFundo = false;
+  dlg.addEventListener('pointerdown', (e) => { tocouFundo = e.target === dlg && performance.now() - abertaEm > 450; });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg && tocouFundo) pedeFechar(); tocouFundo = false; });
   if (location.hash === '#contratar') abre(false);
 
   /* escolhas únicas avançam sozinhas no toque; pelo teclado, Enter confirma */
