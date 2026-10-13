@@ -1,0 +1,38 @@
+{
+ "v": 1,
+ "source": "static",
+ "generatedAt": "2026-10-05T23:45:00Z",
+ "channel": {"id": "UCI7G43SicG2nEoRWxZ72fnA", "handle": "@bandanovayork", "url": "https://www.youtube.com/@bandanovayork"},
+ "featured": "wPa9d6j_FdM",
+ "titles": {
+  "wPa9d6j_FdM": "Apresentação 2026 · teaser",
+  "ZltEydHAbnk": "Banda Nova York 2025",
+  "UGSjLchitUQ": "Depoimento · CDL Itumbiara (GO)",
+  "ZnxkLk2CKmg": "Depoimentos de quem contratou",
+  "IXMUyDiY3QY": "O público da Nova York",
+  "urOwToA36nE": "Boteco Nova York",
+  "C9lUxNfJ_4o": "Sextou do jeito que a gente gosta",
+  "n6C5yYxDaRU": "Carnaval 2025",
+  "xe6u_Oohi3M": "Show em Palmelo (GO)",
+  "sQeiLwFV0h8": "Aniversário de Prata (MG)",
+  "yikSd_TT9Ag": "Ilha Comprida (SP) 2015 · parte 3",
+  "CQiSExPV5L0": "Apresentação",
+  "tCI2G-BXfp0": "Pela estrada"
+ },
+ "items": [
+  {"id": "UGSjLchitUQ", "title": "Depoimento CDL Itumbiara GO", "publishedAt": "2026-09-28T15:56:48+00:00", "isShort": true},
+  {"id": "C9lUxNfJ_4o", "title": "BANDA NOVA YORK - Sextou do jeito que a gente gosta", "publishedAt": "2026-09-11T18:32:43+00:00", "isShort": true},
+  {"id": "urOwToA36nE", "title": "BOTECO - BANDA NOVA YORK", "publishedAt": "2026-09-10T15:01:44+00:00", "isShort": true},
+  {"id": "IXMUyDiY3QY", "title": "Público Banda Nova York", "publishedAt": "2026-09-09T11:25:42+00:00", "isShort": false},
+  {"id": "ZnxkLk2CKmg", "title": "Aqui estão alguns depoimentos que a Banda Nova York sente honrada por compartilhar.", "publishedAt": "2026-09-09T11:21:26+00:00", "isShort": true},
+  {"id": "2G8tmJACT6k", "title": "4 de setembro de 2026", "publishedAt": "2026-09-04T12:04:39+00:00", "isShort": false},
+  {"id": "WNUmI9wXzOA", "title": "2 de setembro de 2026", "publishedAt": "2026-09-02T10:22:13+00:00", "isShort": false},
+  {"id": "wPa9d6j_FdM", "title": "Banda Nova York - Apresentação 2026 - Teaser (cover)", "publishedAt": "2026-09-01T13:26:32+00:00", "isShort": false},
+  {"id": "HGAoh3YVgEo", "title": "25 de agosto de 2026", "publishedAt": "2026-08-25T12:47:01+00:00", "isShort": true},
+  {"id": "n6C5yYxDaRU", "title": "Banda Nova York - Carnaval 2025", "publishedAt": "2025-03-13T18:29:51+00:00", "isShort": true},
+  {"id": "ZltEydHAbnk", "title": "Banda Nova York 2025", "publishedAt": "2025-03-13T18:27:30+00:00", "isShort": false},
+  {"id": "xe6u_Oohi3M", "title": "Banda Nova York - Show em Palmelo Goiás", "publishedAt": "2024-06-26T12:51:11+00:00", "isShort": true},
+  {"id": "sQeiLwFV0h8", "title": "Aniversário 147 Cidade Do Prata MG", "publishedAt": "2020-11-19T23:12:00+00:00", "isShort": false},
+  {"id": "yikSd_TT9Ag", "title": "Banda Nova York - Ilha Comprida SP 2015 part 3", "publishedAt": "2015-01-05T14:36:21+00:00", "isShort": false}
+ ]
+}
